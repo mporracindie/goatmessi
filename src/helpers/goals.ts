@@ -5,11 +5,23 @@ const FIRST_GOAL = 1;
 const LAST_GOAL = 800;
 
 /**
+ * The easter eggs
+ */
+const easterEggs: Record<string, string> = {
+  'montiel': '18-12-2022'
+};
+
+
+/**
  * Get the goal (date and number) by its number
  * @param goalNumber The number of the goal
  * @returns The date of the goal
  */
 const getGoalByNumber = (goalNumber: string) => {
+  if (goalNumber in easterEggs) {
+    return { date: easterEggs[goalNumber], goalNumber: goalNumber };
+  }
+
   const goalNumberString = goalNumber.padStart(4, '0');
   const goal = goalsList.find((goal: Goal) => goal.goalNumber === goalNumberString);
   return { date: goal?.date, goalNumber: goal?.goalNumber };

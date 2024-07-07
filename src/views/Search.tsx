@@ -24,6 +24,8 @@ const Search: React.FC = () => {
   }
   const goals = getGoalsByDate(dayNumber, monthNumber, yearNumber);
 
+  const isMessisBirthday = dayNumber === 24 && monthNumber === 6;
+
   return (
     <Container
       sx={{
@@ -35,6 +37,11 @@ const Search: React.FC = () => {
         textAlign: 'center',
       }}
     >
+      {isMessisBirthday && (
+        <Typography variant="h2" gutterBottom>
+          Happy Birthday Messi!
+        </Typography>
+      )}
       <Typography variant="h4" gutterBottom>
         Select a Goal
       </Typography>

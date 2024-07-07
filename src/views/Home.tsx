@@ -67,6 +67,7 @@ const MainPage: React.FC = () => {
             }}
           >
             <DatePicker label={'DD'} views={['day']} value={date.day} onChange={handleDateChange('day')} />
+            <Typography variant="caption">Optional</Typography>
           </Container>
         </Grid>
         <Grid item>
