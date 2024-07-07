@@ -21,9 +21,12 @@ const getRandomDateBetween = (startDate: string, endDate: string): Dayjs => {
   const randomUnix = getRandomInt(startUnix, endUnix);
   return dayjs.unix(randomUnix);
 };
+
+/*
 const getDateFromDayjs = (day: Dayjs, month: Dayjs, year: Dayjs): string => {
   // return format dd-mm-yyyy
   return `${day.format('DD')}-${month.format('MM')}-${year.format('YYYY')}`;
 }
+*/
 
 export { getRandomDateBetween };

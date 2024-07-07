@@ -4,8 +4,6 @@ import { Box, Container, Typography, Button, Grid } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Dayjs } from 'dayjs';
 import { getRandomGoal } from '../helpers/goals';
-import { Link } from 'react-router-dom';
-// import {  } from '../helpers/messisGoals';
 
 type DateType = {
   day: Dayjs | null;
