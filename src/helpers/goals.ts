@@ -40,7 +40,7 @@ const getGoalsByDate = (day?: number, month?: number, year?: number) => {
   }
   const goals = goalsList.filter((goal: Goal) => {
     const [goalDay, goalMonth, goalYear] = goal.date.split('-').map(Number);
-    return (day === undefined || goalDay === month) && (month === undefined || goalMonth === month) && (year === undefined || goalYear === year);
+    return (day === undefined || goalDay === day) && (month === undefined || goalMonth === month) && (year === undefined || goalYear === year);
   });
   console.log(goals)
   return goals;

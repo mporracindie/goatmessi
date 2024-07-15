@@ -1,6 +1,6 @@
 // src/Search.tsx
 import React from 'react';
-import { Button, Container, Grid, Typography } from '@mui/material';
+import { Button, Container, Grid, Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { getGoalsByDate } from '../helpers/goals';
 import { Goal } from '../types/Goal';
@@ -26,6 +26,10 @@ const Search: React.FC = () => {
 
   const isMessisBirthday = dayNumber === 24 && monthNumber === 6;
 
+  const redirectToRandomGoal = () => {
+    window.location.href = `/goal/${Math.floor(Math.random() * goals.length) + 1}`;
+  };
+
   return (
     <Container
       sx={{
@@ -42,9 +46,25 @@ const Search: React.FC = () => {
           Happy Birthday Messi!
         </Typography>
       )}
-      <Typography variant="h4" gutterBottom>
-        Select a Goal
-      </Typography>
+      {goals.length === 0 ? (
+        <>
+          <Typography variant="h4" gutterBottom>
+            No goals found for this date
+          </Typography>
+          <Box>
+            <Button variant="contained" color="primary" sx={{ mr: 2 }} component={Link} to={`/`}>
+              Search Again
+            </Button>
+            <Button variant="contained" color="secondary" onClick={redirectToRandomGoal}>
+              Random
+            </Button>
+          </Box>
+        </>
+      ) : (
+        <Typography variant="h4" gutterBottom>
+          Select a Goal
+        </Typography>
+      )}
       <Grid container spacing={2} justifyContent="center">
         {goals.map((goal: Goal) => (
           <Grid item key={goal.goalNumber}>

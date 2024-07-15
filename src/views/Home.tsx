@@ -52,7 +52,7 @@ const MainPage: React.FC = () => {
       }}
     >
       <Typography variant="h2" gutterBottom>
-        Título Centrando
+        Messi GOAT 🐐⚽
       </Typography>
       <Grid container spacing={0} justifyContent="center">
         <Grid item sx={{
