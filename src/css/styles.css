@@ -38,6 +38,10 @@ body {
   /* padding: 20px; */
 }
 
+.img-logo {
+  margin: 10px 0px;
+}
+
 .bg-grid {
   /* background-color: aliceblue; */
   padding-top: 10px;

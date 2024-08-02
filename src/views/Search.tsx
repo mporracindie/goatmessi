@@ -1,5 +1,6 @@
 // src/Search.tsx
 import React from 'react';
+import LogoApp from '../components/LogoApp';
 import { useThemeContext } from '../context/ThemeContext';
 import { Button, Container, Grid, Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -50,6 +51,7 @@ const Search: React.FC = () => {
           textAlign: 'center',
         }}
       >
+        <LogoApp />
         {isMessisBirthday && (
           <Typography variant="h2" gutterBottom>
             Happy Birthday Messi!
