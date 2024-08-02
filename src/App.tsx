@@ -12,27 +12,29 @@ import { BrowserRouter } from 'react-router-dom';
 function App() {
   return (
     <ThemeContextProvider>
-      <ToggleColorMode />
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Container
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            width: '100vw',
-          }}
-        >
-          <BrowserRouter >
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/goal/:number" element={<Goal />} />
-            </Routes>
-          </BrowserRouter>
-        </Container>
-      </LocalizationProvider>
+      <div className="content">
+        <ToggleColorMode />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Container
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100vh',
+              width: '100vw',
+            }}
+          >
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/goal/:number" element={<Goal />} />
+              </Routes>
+            </BrowserRouter>
+          </Container>
+        </LocalizationProvider>
+      </div>
     </ThemeContextProvider>
   );
 }
