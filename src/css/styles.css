@@ -38,6 +38,10 @@ body {
   /* padding: 20px; */
 }
 
+.img-logo {
+  margin: 10px 0px;
+}
+
 .bg-grid {
   /* background-color: aliceblue; */
   padding-top: 10px;
@@ -91,6 +95,7 @@ body {
   position: relative;
   overflow: hidden;
   margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .btn-celeste {
@@ -138,6 +143,17 @@ body {
   transition: color 0.3s ease;
 }
 
+/* video  */
+
+.container-video {
+  display: flex;
+  flex-direction: column;
+}
+.link-btn-video {
+  text-decoration: none;
+}
+
+/* responsive  */
 @media (min-width: 480px) {
   .bg-grid {
     flex-direction: row;
