@@ -1,0 +1,145 @@
+body {
+  height: 100%;
+  margin: 0;
+}
+
+.background-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: url('../assets/la10.jpg') no-repeat center center fixed;
+  background-size: cover; */
+  z-index: -1;
+  & img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.background-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.574); /* Puedes ajustar la opacidad aquí */
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: center;
+  /* padding: 20px; */
+}
+
+.bg-grid {
+  /* background-color: aliceblue; */
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+}
+
+.bg-grid-dark {
+  background-color: rgba(12, 12, 12, 0.613);
+}
+.bg-grid-light {
+  background-color: rgba(255, 255, 255, 0.621);
+  color: black;
+}
+
+/* ----------------------- */
+.normal-button {
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  margin-right: 10px;
+  color: #101011; /* Color celeste para el texto */
+}
+.btn-normal-celeste {
+  background-color: #00bfff; /* Color celeste para el borde */
+  &:hover {
+    background-color: #036889;
+    color: white;
+  }
+}
+.btn-normal-violeta {
+  background-color: #ff00d0; /* Color celeste para el borde */
+  &:hover {
+    background-color: #7f0468;
+    color: white;
+  }
+}
+
+.outline-button {
+  padding: 10px 20px;
+  font-size: 18px;
+
+  background: none;
+
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-right: 10px;
+}
+
+.btn-celeste {
+  color: #1fc3e7; /* Color celeste para el texto */
+  border: 2px solid #00bfff; /* Color celeste para el borde */
+}
+
+.btn-violeta {
+  color: #ff00d0; /* Color celeste para el texto */
+  border: 2px solid #ff00d0; /* Color celeste para el borde */
+}
+
+.outline-button:hover span {
+  color: #ffffff; /* Cambia el color del texto al color de fondo cuando se pasa el mouse */
+}
+.outline-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  transition: transform 0.3s ease;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.btn-violeta::before {
+  background-color: #ff00d091;
+}
+
+.btn-celeste::before {
+  background-color: #00bfff6b;
+}
+
+.outline-button:hover::before {
+  transform: scaleX(1);
+}
+
+.outline-button span {
+  position: relative;
+  z-index: 99;
+  color: #f1f2f4;
+  transition: color 0.3s ease;
+}
+
+@media (min-width: 480px) {
+  .bg-grid {
+    flex-direction: row;
+  }
+}
