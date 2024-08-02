@@ -1,6 +1,7 @@
 // src/MainPage.tsx
 import React from 'react';
 import { useThemeContext } from '../context/ThemeContext';
+import LogoApp from '../components/LogoApp';
 
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -61,9 +62,7 @@ const MainPage: React.FC = () => {
           // height: '100vh',
         }}
       >
-        <Typography variant="h2" gutterBottom>
-          Messi GOAT 🐐⚽
-        </Typography>
+        <LogoApp />
         <Grid container spacing={0} justifyContent="center">
           <div className={`bg-grid ${mode === 'dark' ? 'bg-grid-dark' : 'bg-grid-light '}`}>
             <Grid

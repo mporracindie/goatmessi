@@ -1,8 +1,7 @@
 // src/Goal.tsx
 import React from 'react';
 import { useThemeContext } from '../context/ThemeContext';
-
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { getGoalByNumber, getRandomGoal } from '../helpers/goals';
 import background from '../assets/la10.jpg';
@@ -30,27 +29,20 @@ const Goal: React.FC = () => {
       <div className="background-overlay">
         <img src={mode === 'dark' ? background_dark : background} alt="fondo" />
       </div>
-      <Container
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          textAlign: 'center',
-        }}
-      >
+
+      <div className="container-video">
         <Typography variant="h2" gutterBottom>
           Goal #{goalNumber} - {goal.date}
         </Typography>
         <Box
           sx={{
             width: '100%',
-            height: 0,
             paddingBottom: '56.25%',
             position: 'relative',
             mb: 4,
             backgroundColor: 'black',
+            borderRadius: '10px',
+            border: 'none',
           }}
         >
           <video
@@ -65,18 +57,29 @@ const Goal: React.FC = () => {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
+              borderRadius: '10px',
             }}
           />
         </Box>
         <Box>
-          <Button variant="contained" color="primary" sx={{ mr: 2 }} component={Link} to={`/`}>
-            Search Again
-          </Button>
-          <Button variant="contained" color="secondary" onClick={redirectToRandomGoal}>
-            Random
-          </Button>
+          <Link
+            className={
+              mode === 'dark'
+                ? 'link-btn-video outline-button btn-celeste '
+                : 'normal-button btn-normal-celeste link-btn-video '
+            }
+            to={`/`}
+          >
+            <span>Search Again</span>
+          </Link>
+          <button
+            className={mode === 'dark' ? 'outline-button btn-violeta ' : 'normal-button btn-normal-violeta'}
+            onClick={redirectToRandomGoal}
+          >
+            <span>RANDOM</span>
+          </button>
         </Box>
-      </Container>
+      </div>
     </>
   );
 };
