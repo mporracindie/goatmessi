@@ -2,12 +2,12 @@
 import React from 'react';
 import LogoApp from '../components/LogoApp';
 import { useThemeContext } from '../context/ThemeContext';
-import { Button, Container, Grid, Typography, Box } from '@mui/material';
+import { Button, Container, Typography, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { getGoalsByDate } from '../helpers/goals';
-import { Goal } from '../types/Goal';
 import background from '../assets/la10.jpg';
 import background_dark from '../assets/la10_negra.jpg';
+import SearchGridApp from '../components/SearchGridApp';
 
 const Search: React.FC = () => {
   const { mode } = useThemeContext();
@@ -41,17 +41,20 @@ const Search: React.FC = () => {
       <div className="background-overlay">
         <img src={mode === 'dark' ? background_dark : background} alt="fondo" />
       </div>
+
       <Container
         sx={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100vh',
+          // height: '100vh',
+          minHeight: '500px',
+          padding: '50px',
           textAlign: 'center',
         }}
       >
-        <LogoApp />
+        {goals.length <= 10 && <LogoApp />}
         {isMessisBirthday && (
           <Typography variant="h2" gutterBottom>
             Happy Birthday Messi!
@@ -72,28 +75,18 @@ const Search: React.FC = () => {
             </Box>
           </>
         ) : (
-          <Typography variant="h4" gutterBottom>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              marginBottom: '20px',
+            }}
+          >
             Select a Goal
           </Typography>
         )}
-        <Grid container spacing={2} justifyContent="center">
-          {goals.map((goal: Goal) => (
-            <Grid item key={goal.goalNumber} sx={{ paddingBottom: '15px' }}>
-              <Link
-                className={
-                  mode === 'dark'
-                    ? 'link-btn-video outline-button btn-celeste '
-                    : 'normal-button btn-normal-celeste link-btn-video '
-                }
-                to={`/goal/${goal.goalNumber}`}
-              >
-                <span>
-                  {goal.goalNumber} - {goal.date}
-                </span>
-              </Link>
-            </Grid>
-          ))}
-        </Grid>
+
+        <SearchGridApp goals={goals} />
       </Container>
     </>
   );
