@@ -70,7 +70,7 @@ const Goal: React.FC = () => {
             }
             to={`/`}
           >
-            <span>Search Again</span>
+            <span>SEARCH AGAIN</span>
           </Link>
           <button
             className={mode === 'dark' ? 'outline-button btn-violeta ' : 'normal-button btn-normal-violeta'}
