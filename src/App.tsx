@@ -7,6 +7,7 @@ import Home from './views/Home';
 import Goal from './views/GoalViewer';
 import { Routes, Route } from 'react-router';
 import Search from './views/Search';
+import Random from './views/Random';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/goal/:number" element={<Goal />} />
+                <Route path="/random" element={<Random />} />
               </Routes>
             </BrowserRouter>
           </Container>
