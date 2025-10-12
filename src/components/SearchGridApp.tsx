@@ -17,7 +17,7 @@ const SearchGridApp = ({ goals }: any) => {
             to={`/goal/${goal.goalNumber}`}
           >
             <span>
-              {goal.goalNumber} - {goal.date}
+              {parseInt(goal.goalNumber)} - {goal.date}
             </span>
           </Link>
         </div>

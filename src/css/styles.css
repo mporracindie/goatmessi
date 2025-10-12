@@ -138,7 +138,7 @@ body {
 
 .outline-button span {
   position: relative;
-  z-index: 99;
+  z-index: 2;
   color: #f1f2f4;
   transition: color 0.3s ease;
 }

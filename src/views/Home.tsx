@@ -3,7 +3,7 @@ import React from 'react';
 import { useThemeContext } from '../context/ThemeContext';
 import LogoApp from '../components/LogoApp';
 
-import { Box, Container, Typography, Grid } from '@mui/material';
+import { Box, Container, Typography, Grid, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Dayjs } from 'dayjs';
 import { getRandomGoal } from '../helpers/goals';
@@ -23,12 +23,20 @@ const MainPage: React.FC = () => {
     month: null,
     year: null,
   });
+  const [goalNumber, setGoalNumber] = React.useState<string>('');
+  const [goalNumberError, setGoalNumberError] = React.useState<string>('');
 
   const handleDateChange = (key: keyof DateType) => (newValue: Dayjs | null) => {
     setDate((prevDate) => ({
       ...prevDate,
       [key]: newValue,
     }));
+  };
+
+  const handleGoalNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setGoalNumber(value);
+    setGoalNumberError('');
   };
 
   const handleDateSearch = () => {
@@ -39,13 +47,25 @@ const MainPage: React.FC = () => {
       return;
     }
 
-    window.location.href = `/search?${day ? `day=${day}` : ''}${month ? `&month=${month}` : ''}${
-      year ? `&year=${year}` : ''
-    }`;
+    window.location.href = `/search?${day ? `day=${day}` : ''}${month ? `&month=${month}` : ''}${year ? `&year=${year}` : ''
+      }`;
   };
 
   const redirectToRandomGoal = () => {
     window.location.href = `/goal/${getRandomGoal()}`;
+  };
+
+  const handleGoalNumberSearch = () => {
+    const num = parseInt(goalNumber);
+    if (isNaN(num)) {
+      setGoalNumberError('Please enter a valid number');
+      return;
+    }
+    if (num < 1 || num > 800) {
+      setGoalNumberError('Please enter a number between 1 and 800');
+      return;
+    }
+    window.location.href = `/goal/${num}`;
   };
 
   return (
@@ -63,6 +83,9 @@ const MainPage: React.FC = () => {
         }}
       >
         <LogoApp />
+        <Typography variant="h6" textAlign="center" mb={2}>
+          Search by date
+        </Typography>
         <Grid container spacing={0} justifyContent="center">
           <div className={`bg-grid ${mode === 'dark' ? 'bg-grid-dark' : 'bg-grid-light '}`}>
             <Grid
@@ -134,6 +157,35 @@ const MainPage: React.FC = () => {
           >
             <span>RANDOM</span>
           </button>
+        </Box>
+
+        <Box mt={4} width="100%">
+          <Typography variant="h6" textAlign="center" mb={2}>
+            Or search by goal number
+          </Typography>
+          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+            <TextField
+              label="Goal Number"
+              type="number"
+              value={goalNumber}
+              onChange={handleGoalNumberChange}
+              error={!!goalNumberError}
+              helperText={goalNumberError}
+              sx={{ width: '250px' }}
+              inputProps={{ min: 1, max: 800 }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleGoalNumberSearch();
+                }
+              }}
+            />
+            <button
+              className={mode === 'dark' ? 'outline-button btn-celeste' : 'normal-button btn-normal-celeste'}
+              onClick={handleGoalNumberSearch}
+            >
+              <span>SEARCH BY NUMBER</span>
+            </button>
+          </Box>
         </Box>
       </Container>
     </>

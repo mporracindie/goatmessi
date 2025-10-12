@@ -1,8 +1,8 @@
 // src/Search.tsx
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import LogoApp from '../components/LogoApp';
 import { useThemeContext } from '../context/ThemeContext';
-import { Button, Container, Typography, Box } from '@mui/material';
+import { Button, Container, Typography, Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { getGoalsByDate } from '../helpers/goals';
 import background from '../assets/la10.jpg';
@@ -11,6 +11,7 @@ import SearchGridApp from '../components/SearchGridApp';
 
 const Search: React.FC = () => {
   const { mode } = useThemeContext();
+  const [sortBy, setSortBy] = useState<'number' | 'date'>('number');
 
   // get from the URL the day, month and year and call getGoalsByDate
   // to get the goals for that date
@@ -28,9 +29,34 @@ const Search: React.FC = () => {
     // redirect to the home page if the day is not provided
     window.location.href = '/';
   }
-  const goals = getGoalsByDate(dayNumber, monthNumber, yearNumber);
+  const goalsData = getGoalsByDate(dayNumber, monthNumber, yearNumber);
+
+  // Sort goals based on the selected sort method
+  const goals = useMemo(() => {
+    const sortedGoals = [...goalsData];
+    if (sortBy === 'number') {
+      // Sort by goal number (ascending)
+      sortedGoals.sort((a, b) => parseInt(a.goalNumber) - parseInt(b.goalNumber));
+    } else {
+      // Sort by date (most recent first)
+      sortedGoals.sort((a, b) => {
+        const [dayA, monthA, yearA] = a.date.split('-').map(Number);
+        const [dayB, monthB, yearB] = b.date.split('-').map(Number);
+        const dateA = new Date(yearA, monthA - 1, dayA);
+        const dateB = new Date(yearB, monthB - 1, dayB);
+        return dateB.getTime() - dateA.getTime();
+      });
+    }
+    return sortedGoals;
+  }, [goalsData, sortBy]);
 
   const isMessisBirthday = dayNumber === 24 && monthNumber === 6;
+
+  const handleSortChange = (_event: React.MouseEvent<HTMLElement>, newSortBy: 'number' | 'date') => {
+    if (newSortBy !== null) {
+      setSortBy(newSortBy);
+    }
+  };
 
   const redirectToRandomGoal = () => {
     window.location.href = `/goal/${Math.floor(Math.random() * goals.length) + 1}`;
@@ -54,12 +80,14 @@ const Search: React.FC = () => {
           textAlign: 'center',
         }}
       >
+        {/* Top section - non-sticky */}
         {goals.length <= 10 && <LogoApp />}
         {isMessisBirthday && (
           <Typography variant="h2" gutterBottom>
             Happy Birthday Messi!
           </Typography>
         )}
+        
         {goals.length === 0 ? (
           <>
             <Typography variant="h4" gutterBottom>
@@ -75,18 +103,49 @@ const Search: React.FC = () => {
             </Box>
           </>
         ) : (
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{
-              marginBottom: '20px',
-            }}
-          >
-            Select a Goal
-          </Typography>
-        )}
+          <>
+            {/* Sticky header for title and sort controls */}
+            <Box
+              sx={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 10,
+                backdropFilter: 'blur(10px)',
+                padding: '16px 0',
+                width: '100%',
+                marginBottom: '100px',
+                borderBottom: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <Typography
+                variant="h4"
+                gutterBottom
+                sx={{
+                  marginBottom: '16px',
+                }}
+              >
+                Select a Goal
+              </Typography>
+              <ToggleButtonGroup
+                value={sortBy}
+                exclusive
+                onChange={handleSortChange}
+                aria-label="sort by"
+                color="primary"
+              >
+                <ToggleButton value="number" aria-label="sort by goal number">
+                  Sort by Goal Number
+                </ToggleButton>
+                <ToggleButton value="date" aria-label="sort by date">
+                  Sort by Date
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
 
-        <SearchGridApp goals={goals} />
+            <SearchGridApp goals={goals} />
+          </>
+        )}
+      
       </Container>
     </>
   );
