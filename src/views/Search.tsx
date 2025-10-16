@@ -8,6 +8,7 @@ import { getGoalsByDate } from '../helpers/goals';
 import background from '../assets/la10.jpg';
 import background_dark from '../assets/la10_negra.jpg';
 import SearchGridApp from '../components/SearchGridApp';
+import { getSpecialDateMessage } from '../helpers/specialDates';
 
 const Search: React.FC = () => {
   const { mode } = useThemeContext();
@@ -51,6 +52,7 @@ const Search: React.FC = () => {
   }, [goalsData, sortBy]);
 
   const isMessisBirthday = dayNumber === 24 && monthNumber === 6;
+  const specialDateMessage = getSpecialDateMessage(dayNumber, monthNumber, yearNumber);
 
   const handleSortChange = (_event: React.MouseEvent<HTMLElement>, newSortBy: 'number' | 'date') => {
     if (newSortBy !== null) {
@@ -90,6 +92,18 @@ const Search: React.FC = () => {
         
         {goals.length === 0 ? (
           <>
+            {specialDateMessage && (
+              <Typography
+                variant="h6"
+                sx={{
+                  marginBottom: '16px',
+                  color: mode === 'dark' ? '#FFD700' : '#FF6B00',
+                  fontWeight: 'bold',
+                }}
+              >
+                🎉 {specialDateMessage}
+              </Typography>
+            )}
             <Typography variant="h4" gutterBottom>
               No goals found for this date
             </Typography>
@@ -126,6 +140,18 @@ const Search: React.FC = () => {
               >
                 Select a Goal
               </Typography>
+              {specialDateMessage && (
+                <Typography
+                  variant="h6"
+                  sx={{
+                    marginBottom: '16px',
+                    color: mode === 'dark' ? '#FFD700' : '#FF6B00',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  🎉 {specialDateMessage}
+                </Typography>
+              )}
               <ToggleButtonGroup
                 value={sortBy}
                 exclusive

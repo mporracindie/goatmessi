@@ -83,6 +83,15 @@ body {
   }
 }
 
+.btn-normal-special-orange {
+  background-color: #FF6B00; /* Orange color for special dates */
+  color: white;
+  &:hover {
+    background-color: #CC5500;
+    color: white;
+  }
+}
+
 .outline-button {
   padding: 10px 20px;
   font-size: 18px;
@@ -108,6 +117,11 @@ body {
   border: 2px solid #ff00d0; /* Color celeste para el borde */
 }
 
+.btn-special-gold {
+  color: #FFD700; /* Gold color for special dates */
+  border: 2px solid #FFD700;
+}
+
 .outline-button:hover span {
   color: #ffffff; /* Cambia el color del texto al color de fondo cuando se pasa el mouse */
 }
@@ -130,6 +144,10 @@ body {
 
 .btn-celeste::before {
   background-color: #00bfff6b;
+}
+
+.btn-special-gold::before {
+  background-color: #FFD70091;
 }
 
 .outline-button:hover::before {
