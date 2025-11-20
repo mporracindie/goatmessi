@@ -116,13 +116,23 @@ const Feed: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const activeIndexRef = useRef(0);
+  const goalsLengthRef = useRef(0);
+  const isLoadingRef = useRef(false);
 
-  // Load initial goals
+  // Keep refs in sync with state
   useEffect(() => {
-    addMoreGoals(5);
-  }, []);
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
 
-  const addMoreGoals = (count: number) => {
+  useEffect(() => {
+    goalsLengthRef.current = goals.length;
+  }, [goals.length]);
+
+  const addMoreGoals = useCallback((count: number) => {
+    if (isLoadingRef.current) return; // Prevent multiple simultaneous loads
+    
+    isLoadingRef.current = true;
     const newGoals: FeedGoal[] = [];
     for (let i = 0; i < count; i++) {
       const randomNum = getRandomGoal();
@@ -136,7 +146,16 @@ const Feed: React.FC = () => {
       }
     }
     setGoals(prev => [...prev, ...newGoals]);
-  };
+    // Small delay to prevent rapid successive loads
+    setTimeout(() => {
+      isLoadingRef.current = false;
+    }, 100);
+  }, []);
+
+  // Load initial goals
+  useEffect(() => {
+    addMoreGoals(5);
+  }, [addMoreGoals]);
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
@@ -144,21 +163,17 @@ const Feed: React.FC = () => {
     const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
     const index = Math.round(scrollTop / clientHeight);
     
-    if (index !== activeIndex) {
+    if (index !== activeIndexRef.current) {
       setActiveIndex(index);
     }
 
     // Load more when getting close to bottom
     if (scrollHeight - scrollTop - clientHeight < clientHeight * 2) {
-        // Debounce this in a real app, but strictly checking length might be enough
-        // We need to be careful not to add continuously.
-        // Actually, standard "infinite scroll" often uses a sentinel. 
-        // But let's just add more if we are at the last item.
-        if (index >= goals.length - 2) {
+        if (index >= goalsLengthRef.current - 2 && !isLoadingRef.current) {
              addMoreGoals(3);
         }
     }
-  }, [activeIndex, goals.length]);
+  }, [addMoreGoals]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -208,14 +223,18 @@ const Feed: React.FC = () => {
             scrollBehavior: 'smooth',
         }}
       >
-        {goals.map((goal, index) => (
-          <FeedItem 
-            key={goal.id} 
-            item={goal} 
-            isActive={index === activeIndex} 
-            shouldPreload={index > activeIndex && index <= activeIndex + 2} // Preload next 2 videos
-          />
-        ))}
+        {goals.map((goal, index) => {
+          // Preload videos within range: 1 behind and 2 ahead
+          const shouldPreload = Math.abs(index - activeIndex) >= 1 && Math.abs(index - activeIndex) <= 2;
+          return (
+            <FeedItem 
+              key={goal.id} 
+              item={goal} 
+              isActive={index === activeIndex} 
+              shouldPreload={shouldPreload}
+            />
+          );
+        })}
       </div>
     </Box>
   );
