@@ -8,6 +8,7 @@ import Goal from './views/GoalViewer';
 import { Routes, Route } from 'react-router';
 import Search from './views/Search';
 import Random from './views/Random';
+import Feed from './views/Feed';
 import { BrowserRouter } from 'react-router-dom';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/goal/:number" element={<Goal />} />
                 <Route path="/random" element={<Random />} />
+                <Route path="/feed" element={<Feed />} />
               </Routes>
             </BrowserRouter>
           </Container>

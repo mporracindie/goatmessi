@@ -157,6 +157,12 @@ const MainPage: React.FC = () => {
           >
             <span>RANDOM</span>
           </button>
+          <button
+            className={mode === 'dark' ? 'outline-button btn-celeste ' : 'normal-button btn-normal-celeste'}
+            onClick={() => window.location.href = '/feed'}
+          >
+            <span>FEED MODE</span>
+          </button>
         </Box>
 
         <Box mt={4} width="100%">
