@@ -184,6 +184,32 @@ body {
   text-decoration: none;
 }
 
+/* Primary CTA button styling */
+.primary-cta {
+  transform: scale(1.05);
+  font-weight: 600;
+}
+
+/* Improved button spacing for mobile */
+@media (max-width: 600px) {
+  .normal-button, .outline-button {
+    width: 100%;
+    max-width: 280px;
+    margin: 8px 0 !important;
+  }
+
+  .primary-cta {
+    margin-top: 16px !important;
+  }
+}
+
+/* Desktop button layout */
+@media (min-width: 601px) {
+  .normal-button, .outline-button {
+    margin: 0 8px 16px 8px !important;
+  }
+}
+
 /* responsive  */
 @media (min-width: 480px) {
   .bg-grid {

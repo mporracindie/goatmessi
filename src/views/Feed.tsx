@@ -11,7 +11,7 @@ interface FeedGoal {
   date: string;
 }
 
-const FeedItem: React.FC<{ item: FeedGoal; isActive: boolean }> = ({ item, isActive }) => {
+const FeedItem: React.FC<{ item: FeedGoal; isActive: boolean; shouldPreload: boolean }> = ({ item, isActive, shouldPreload }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const specialMessage = isSpecialDate(item.date);
@@ -47,6 +47,7 @@ const FeedItem: React.FC<{ item: FeedGoal; isActive: boolean }> = ({ item, isAct
       <video
         ref={videoRef}
         src={videoSrc}
+        preload={isActive || shouldPreload ? 'auto' : 'none'}
         loop
         playsInline
         muted={false} // Users might expect sound, but autoplay usually requires muted first on some browsers. 
@@ -208,7 +209,12 @@ const Feed: React.FC = () => {
         }}
       >
         {goals.map((goal, index) => (
-          <FeedItem key={goal.id} item={goal} isActive={index === activeIndex} />
+          <FeedItem 
+            key={goal.id} 
+            item={goal} 
+            isActive={index === activeIndex} 
+            shouldPreload={index > activeIndex && index <= activeIndex + 2} // Preload next 2 videos
+          />
         ))}
       </div>
     </Box>
