@@ -1,13 +1,13 @@
 import React from 'react';
 import { useThemeContext } from '../context/ThemeContext';
 import LogoApp from '../components/LogoApp';
-import { Box, Container, Typography, Paper, TextField, Stack, Chip } from '@mui/material';
+import { Box, Container, Typography, Paper, TextField, Stack } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Dayjs } from 'dayjs';
 import { getRandomGoal } from '../helpers/goals';
 import background from '../assets/la10.jpg';
 import background_dark from '../assets/la10_negra.jpg';
-import { Search, Shuffle, Feed, SportsSoccer } from '@mui/icons-material';
+import { Search, SportsSoccer } from '@mui/icons-material';
 
 type DateType = {
   day: Dayjs | null;
