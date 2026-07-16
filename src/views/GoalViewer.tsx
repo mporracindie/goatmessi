@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 import { Box, Typography, Tooltip, Stack } from '@mui/material';
 import { PlayArrow, Home as HomeIcon } from '@mui/icons-material';
@@ -14,10 +15,16 @@ const specialColor = '#FFD700';
 
 const Goal: React.FC = () => {
   const { locale, t } = useLocale();
+  const { number: routeNumber } = useParams<{ number: string }>();
 
-  const goalNumber = window.location.pathname.split('/').pop();
+  // Cloudflare Pages serves prerendered goals as /goal/:n/ (trailing slash).
+  // Falling back to pathname must ignore empty trailing segments.
+  const goalNumber =
+    routeNumber ||
+    window.location.pathname.split('/').filter(Boolean).pop() ||
+    '';
 
-  const goal = getGoalByNumber(goalNumber || '');
+  const goal = getGoalByNumber(goalNumber);
   if (!goal?.date) {
     window.location.href = '/';
     return null;
@@ -91,7 +98,7 @@ const Goal: React.FC = () => {
             }}
           >
             {isSpecial && '⭐ '}
-            {t('goal.title', { number: goalNumber || '' })}
+            {t('goal.title', { number: String(goalNo) })}
           </Typography>
         </Tooltip>
 

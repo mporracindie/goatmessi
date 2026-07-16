@@ -44,6 +44,7 @@ const AppShell: React.FC = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/goal/:number/" element={<Goal />} />
               <Route path="/goal/:number" element={<Goal />} />
               <Route path="/random" element={<Random />} />
               <Route path="/feed" element={<Feed />} />
