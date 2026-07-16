@@ -11,6 +11,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://todoslosgolesdemessi.com/table</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://todoslosgolesdemessi.com/goal/1</loc>
     <lastmod>2026-07-16</lastmod>
     <changefreq>monthly</changefreq>

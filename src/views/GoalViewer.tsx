@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
-import { Box, Typography, Tooltip, Stack } from '@mui/material';
-import { PlayArrow, Home as HomeIcon } from '@mui/icons-material';
+import { Box, Typography, Tooltip, Stack, Link } from '@mui/material';
+import { PlayArrow, Home as HomeIcon, EditOutlined } from '@mui/icons-material';
 import { getGoalByNumber, getRandomGoal } from '../helpers/goals';
-import { buildGoalVideoJsonLd } from '../helpers/seo';
+import { buildGoalVideoJsonLd, SITE_URL } from '../helpers/seo';
 import background from '../assets/messi_argentina_dark.jpg';
 import { isSpecialDate } from '../helpers/specialDates';
 import { TranslationKey } from '../i18n/translations';
@@ -12,6 +12,8 @@ import PageMeta from '../components/PageMeta';
 import VideoWatermark from '../components/VideoWatermark';
 
 const specialColor = '#FFD700';
+/** @marcoporracin — required for X DM compose deep links */
+const TWITTER_DM_RECIPIENT_ID = '449478542';
 
 const Goal: React.FC = () => {
   const { locale, t } = useLocale();
@@ -46,6 +48,10 @@ const Goal: React.FC = () => {
 
   const goalNo = Number(goal.goalNumber);
   const videoSrc = `https://messi.aws.porracin.com/${goal.goalNumber}_${goal.date}.mp4`;
+  const goalUrl = `${SITE_URL}/goal/${goalNo}`;
+  const suggestCorrectionHref = `https://x.com/messages/compose?recipient_id=${TWITTER_DM_RECIPIENT_ID}&text=${encodeURIComponent(
+    t('goal.suggestCorrectionDm', { number: goalNo, url: goalUrl }),
+  )}`;
   const goalTitle = t('seo.goalTitle', {
     number: goalNo,
     team: goal.team,
@@ -167,6 +173,26 @@ const Goal: React.FC = () => {
             {t('goal.random')}
           </button>
         </Stack>
+
+        <Link
+          href={suggestCorrectionHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="hover"
+          sx={{
+            mt: 2.5,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            color: 'rgba(255, 255, 255, 0.55)',
+            fontSize: '0.85rem',
+            fontWeight: 500,
+            '&:hover': { color: 'rgba(255, 255, 255, 0.85)' },
+          }}
+        >
+          <EditOutlined sx={{ fontSize: 16 }} />
+          {t('goal.suggestCorrection')}
+        </Link>
       </div>
     </>
   );

@@ -29,10 +29,16 @@ const Search: React.FC = () => {
   const opponent = params.get('opponent') || undefined;
   const type = params.get('type') || undefined;
   const how = params.get('how') || undefined;
+  const minuteMinParam = params.get('minuteMin');
+  const minuteMaxParam = params.get('minuteMax');
 
   const dayNumber = day ? parseInt(day, 10) : undefined;
   const monthNumber = month ? parseInt(month, 10) : undefined;
   const yearNumber = year ? parseInt(year, 10) : undefined;
+  const minuteMin = minuteMinParam ? parseInt(minuteMinParam, 10) : undefined;
+  const minuteMax = minuteMaxParam ? parseInt(minuteMaxParam, 10) : undefined;
+  const minuteMinNumber = minuteMin !== undefined && !Number.isNaN(minuteMin) ? minuteMin : undefined;
+  const minuteMaxNumber = minuteMax !== undefined && !Number.isNaN(minuteMax) ? minuteMax : undefined;
 
   const filters = {
     day: dayNumber,
@@ -43,6 +49,8 @@ const Search: React.FC = () => {
     opponent,
     type,
     how,
+    minuteMin: minuteMinNumber,
+    minuteMax: minuteMaxNumber,
   };
 
   if (!hasActiveFilters(filters)) {
@@ -57,6 +65,17 @@ const Search: React.FC = () => {
     const translated = t(key);
     return translated === key ? value : translated;
   };
+
+  const minuteSummary =
+    minuteMinNumber !== undefined && minuteMaxNumber !== undefined
+      ? minuteMinNumber === minuteMaxNumber
+        ? t('search.minuteExact', { value: minuteMinNumber })
+        : t('search.minuteRange', { min: minuteMinNumber, max: minuteMaxNumber })
+      : minuteMinNumber !== undefined
+        ? t('search.minuteFrom', { value: minuteMinNumber })
+        : minuteMaxNumber !== undefined
+          ? t('search.minuteTo', { value: minuteMaxNumber })
+          : null;
 
   const filterSummary = [
     dayNumber && monthNumber && yearNumber
@@ -73,6 +92,7 @@ const Search: React.FC = () => {
     opponent && t('search.vs', { opponent }),
     translateMeta(type),
     translateMeta(how),
+    minuteSummary,
   ]
     .filter(Boolean)
     .join(' · ');

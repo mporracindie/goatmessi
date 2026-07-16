@@ -19,6 +19,7 @@ Updated: 2026-07-16
 
 - Home / search finder: https://todoslosgolesdemessi.com/
 - Scrollable goal feed: https://todoslosgolesdemessi.com/feed
+- Filterable goals table: https://todoslosgolesdemessi.com/table
 - Individual goal pages: https://todoslosgolesdemessi.com/goal/{number} (1–919)
 - Sitemap: https://todoslosgolesdemessi.com/sitemap.xml
 - Open Graph image: https://todoslosgolesdemessi.com/og.png

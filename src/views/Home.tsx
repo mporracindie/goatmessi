@@ -15,7 +15,7 @@ import { Dayjs } from 'dayjs';
 import { filterOptions, getRandomGoal, LAST_GOAL } from '../helpers/goals';
 import { buildWebsiteJsonLd, homeMeta } from '../helpers/seo';
 import background from '../assets/messi_argentina_dark.jpg';
-import { CalendarMonth, FilterList, PlayArrow, SportsSoccer, Tag } from '@mui/icons-material';
+import { CalendarMonth, FilterList, PlayArrow, SportsSoccer, TableRows, Tag } from '@mui/icons-material';
 import { TranslationKey } from '../i18n/translations';
 import PageMeta from '../components/PageMeta';
 
@@ -41,6 +41,8 @@ const MainPage: React.FC = () => {
   const [opponent, setOpponent] = React.useState<string | null>(null);
   const [type, setType] = React.useState('');
   const [how, setHow] = React.useState('');
+  const [minuteMin, setMinuteMin] = React.useState('');
+  const [minuteMax, setMinuteMax] = React.useState('');
   const [goalNumber, setGoalNumber] = React.useState<string>('');
   const [goalNumberError, setGoalNumberError] = React.useState<string>('');
 
@@ -83,6 +85,11 @@ const MainPage: React.FC = () => {
     if (type) params.set('type', type);
     if (how) params.set('how', how);
 
+    const parsedMinuteMin = minuteMin ? parseInt(minuteMin, 10) : NaN;
+    const parsedMinuteMax = minuteMax ? parseInt(minuteMax, 10) : NaN;
+    if (!Number.isNaN(parsedMinuteMin)) params.set('minuteMin', String(parsedMinuteMin));
+    if (!Number.isNaN(parsedMinuteMax)) params.set('minuteMax', String(parsedMinuteMax));
+
     if ([...params.keys()].length === 0) {
       return;
     }
@@ -108,7 +115,16 @@ const MainPage: React.FC = () => {
   };
 
   const hasSearchFilters = Boolean(
-    date.day || date.month || date.year || team || competition || opponent || type || how,
+    date.day ||
+      date.month ||
+      date.year ||
+      team ||
+      competition ||
+      opponent ||
+      type ||
+      how ||
+      minuteMin ||
+      minuteMax,
   );
 
   return (
@@ -188,6 +204,10 @@ const MainPage: React.FC = () => {
             <button className="cta-ghost" onClick={() => (window.location.href = '/feed')}>
               <SportsSoccer fontSize="small" />
               {t('home.browseFeed')}
+            </button>
+            <button className="cta-ghost" onClick={() => (window.location.href = '/table')}>
+              <TableRows fontSize="small" />
+              {t('home.browseTable')}
             </button>
           </Stack>
         </Box>
@@ -315,6 +335,26 @@ const MainPage: React.FC = () => {
                     </MenuItem>
                   ))}
                 </TextField>
+              </Stack>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+                <TextField
+                  label={t('home.minuteFrom')}
+                  type="number"
+                  size="small"
+                  value={minuteMin}
+                  onChange={(e) => setMinuteMin(e.target.value)}
+                  fullWidth
+                  inputProps={{ min: 1, max: 120 }}
+                />
+                <TextField
+                  label={t('home.minuteTo')}
+                  type="number"
+                  size="small"
+                  value={minuteMax}
+                  onChange={(e) => setMinuteMax(e.target.value)}
+                  fullWidth
+                  inputProps={{ min: 1, max: 120 }}
+                />
               </Stack>
             </Stack>
           </Box>

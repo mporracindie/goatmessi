@@ -15,6 +15,7 @@ import { Routes, Route } from 'react-router';
 import Search from './views/Search';
 import Random from './views/Random';
 import Feed from './views/Feed';
+import GoalsTable from './views/GoalsTable';
 import { BrowserRouter } from 'react-router-dom';
 
 const AppShell: React.FC = () => {
@@ -48,6 +49,7 @@ const AppShell: React.FC = () => {
               <Route path="/goal/:number" element={<Goal />} />
               <Route path="/random" element={<Random />} />
               <Route path="/feed" element={<Feed />} />
+              <Route path="/table" element={<GoalsTable />} />
             </Routes>
             <SiteFooter />
           </BrowserRouter>

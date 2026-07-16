@@ -20,6 +20,20 @@ export type GoalFilters = {
   opponent?: string;
   type?: string;
   how?: string;
+  minuteMin?: number;
+  minuteMax?: number;
+};
+
+/** Base minute for filtering — "90+2" → 90 so stoppage matches its period. */
+const parseGoalMinute = (minute: number | string): number | null => {
+  if (typeof minute === 'number' && Number.isFinite(minute)) {
+    return minute;
+  }
+  if (typeof minute === 'string') {
+    const match = minute.trim().match(/^(\d+)/);
+    if (match) return Number(match[1]);
+  }
+  return null;
 };
 
 const uniqueSorted = (values: Array<string | null | undefined>) =>
@@ -33,6 +47,14 @@ const filterOptions = {
   opponents: uniqueSorted(goalsList.map((goal) => goal.opponent)),
   types: uniqueSorted(goalsList.map((goal) => goal.type)),
   hows: uniqueSorted(goalsList.map((goal) => goal.how)),
+  years: [
+    ...new Set(
+      goalsList.map((goal) => {
+        const [, , year] = goal.date.split('-');
+        return year;
+      }),
+    ),
+  ].sort((a, b) => Number(b) - Number(a)),
 };
 
 const hasActiveFilters = (filters: GoalFilters) =>
@@ -44,7 +66,9 @@ const hasActiveFilters = (filters: GoalFilters) =>
       filters.competition ||
       filters.opponent ||
       filters.type ||
-      filters.how,
+      filters.how ||
+      filters.minuteMin !== undefined ||
+      filters.minuteMax !== undefined,
   );
 
 /**
@@ -87,11 +111,12 @@ const getGoalsByDate = (day?: number, month?: number, year?: number) => {
 };
 
 /**
- * Search goals by any combination of date and match details
+ * Filter goals by any combination of date and match details.
+ * Returns the full list when no filters are active.
  */
-const searchGoals = (filters: GoalFilters): Goal[] => {
+const filterGoals = (filters: GoalFilters): Goal[] => {
   if (!hasActiveFilters(filters)) {
-    return [];
+    return goalsList;
   }
 
   return goalsList.filter((goal: Goal) => {
@@ -106,8 +131,34 @@ const searchGoals = (filters: GoalFilters): Goal[] => {
     if (filters.type && goal.type !== filters.type) return false;
     if (filters.how && goal.how !== filters.how) return false;
 
+    if (filters.minuteMin !== undefined || filters.minuteMax !== undefined) {
+      const goalMinute = parseGoalMinute(goal.minute);
+      if (goalMinute === null) return false;
+
+      let min = filters.minuteMin;
+      let max = filters.minuteMax;
+      if (min !== undefined && max !== undefined && min > max) {
+        [min, max] = [max, min];
+      }
+
+      if (min !== undefined && goalMinute < min) return false;
+      if (max !== undefined && goalMinute > max) return false;
+    }
+
     return true;
   });
+};
+
+/**
+ * Search goals by any combination of date and match details.
+ * Returns an empty list when no filters are active (search requires a query).
+ */
+const searchGoals = (filters: GoalFilters): Goal[] => {
+  if (!hasActiveFilters(filters)) {
+    return [];
+  }
+
+  return filterGoals(filters);
 };
 
 const getRandomGoal = () => {
@@ -117,6 +168,7 @@ const getRandomGoal = () => {
 export {
   FIRST_GOAL,
   LAST_GOAL,
+  filterGoals,
   filterOptions,
   getGoalByNumber,
   getGoalsByDate,
