@@ -1,45 +1,87 @@
-// src/Search.tsx
 import React, { useState, useMemo } from 'react';
-import LogoApp from '../components/LogoApp';
-import { useThemeContext } from '../context/ThemeContext';
-import { Button, Container, Typography, Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { getGoalsByDate } from '../helpers/goals';
-import background from '../assets/la10.jpg';
-import background_dark from '../assets/la10_negra.jpg';
+import { useNavigate } from 'react-router-dom';
+import { useLocale } from '../context/LocaleContext';
+import { Container, Typography, Box, ToggleButton, ToggleButtonGroup, Stack } from '@mui/material';
+import { PlayArrow, Home as HomeIcon } from '@mui/icons-material';
+import { getRandomGoal, hasActiveFilters, searchGoals } from '../helpers/goals';
+import { savePlaylist } from '../helpers/playlist';
+import background from '../assets/messi_argentina_dark.jpg';
 import SearchGridApp from '../components/SearchGridApp';
 import { getSpecialDateMessage } from '../helpers/specialDates';
+import { TranslationKey } from '../i18n/translations';
+import PageMeta from '../components/PageMeta';
+
+const panelBg = 'rgba(10, 12, 16, 0.72)';
+const panelBorder = 'rgba(255, 255, 255, 0.08)';
+const specialColor = '#FFD700';
 
 const Search: React.FC = () => {
-  const { mode } = useThemeContext();
+  const { locale, t } = useLocale();
+  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<'number' | 'date'>('number');
 
-  // get from the URL the day, month and year and call getGoalsByDate
-  // to get the goals for that date
-  // if the day, month or year are not provided, get all the goals
-  // from the API
-  const day = new URLSearchParams(window.location.search).get('day');
-  const month = new URLSearchParams(window.location.search).get('month');
-  const year = new URLSearchParams(window.location.search).get('year');
-  // convert them to numbers
+  const params = new URLSearchParams(window.location.search);
+  const day = params.get('day');
+  const month = params.get('month');
+  const year = params.get('year');
+  const team = params.get('team') || undefined;
+  const competition = params.get('competition') || undefined;
+  const opponent = params.get('opponent') || undefined;
+  const type = params.get('type') || undefined;
+  const how = params.get('how') || undefined;
+
   const dayNumber = day ? parseInt(day, 10) : undefined;
   const monthNumber = month ? parseInt(month, 10) : undefined;
   const yearNumber = year ? parseInt(year, 10) : undefined;
-  // get the goals
-  if (!dayNumber && !monthNumber && !yearNumber) {
-    // redirect to the home page if the day is not provided
+
+  const filters = {
+    day: dayNumber,
+    month: monthNumber,
+    year: yearNumber,
+    team,
+    competition,
+    opponent,
+    type,
+    how,
+  };
+
+  if (!hasActiveFilters(filters)) {
     window.location.href = '/';
   }
-  const goalsData = getGoalsByDate(dayNumber, monthNumber, yearNumber);
 
-  // Sort goals based on the selected sort method
+  const goalsData = searchGoals(filters);
+
+  const translateMeta = (value?: string) => {
+    if (!value) return value;
+    const key = `goalMeta.${value}` as TranslationKey;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
+
+  const filterSummary = [
+    dayNumber && monthNumber && yearNumber
+      ? `${String(dayNumber).padStart(2, '0')}-${String(monthNumber).padStart(2, '0')}-${yearNumber}`
+      : [
+          dayNumber && t('search.day', { value: dayNumber }),
+          monthNumber && t('search.month', { value: monthNumber }),
+          yearNumber && t('search.year', { value: yearNumber }),
+        ]
+          .filter(Boolean)
+          .join(', '),
+    team,
+    competition,
+    opponent && t('search.vs', { opponent }),
+    translateMeta(type),
+    translateMeta(how),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   const goals = useMemo(() => {
     const sortedGoals = [...goalsData];
     if (sortBy === 'number') {
-      // Sort by goal number (ascending)
       sortedGoals.sort((a, b) => parseInt(a.goalNumber) - parseInt(b.goalNumber));
     } else {
-      // Sort by date (most recent first)
       sortedGoals.sort((a, b) => {
         const [dayA, monthA, yearA] = a.date.split('-').map(Number);
         const [dayB, monthB, yearB] = b.date.split('-').map(Number);
@@ -52,7 +94,7 @@ const Search: React.FC = () => {
   }, [goalsData, sortBy]);
 
   const isMessisBirthday = dayNumber === 24 && monthNumber === 6;
-  const specialDateMessage = getSpecialDateMessage(dayNumber, monthNumber, yearNumber);
+  const specialDateMessage = getSpecialDateMessage(dayNumber, monthNumber, yearNumber, locale);
 
   const handleSortChange = (_event: React.MouseEvent<HTMLElement>, newSortBy: 'number' | 'date') => {
     if (newSortBy !== null) {
@@ -61,117 +103,225 @@ const Search: React.FC = () => {
   };
 
   const redirectToRandomGoal = () => {
-    window.location.href = `/goal/${Math.floor(Math.random() * goals.length) + 1}`;
+    window.location.href = `/goal/${getRandomGoal()}`;
+  };
+
+  const playAllResults = () => {
+    savePlaylist(
+      goals.map((goal) => ({ goalNumber: goal.goalNumber, date: goal.date })),
+      `${window.location.pathname}${window.location.search}`,
+    );
+    navigate('/feed?playlist=1');
   };
 
   return (
     <>
-      <div className="background-overlay">
-        <img src={mode === 'dark' ? background_dark : background} alt="fondo" />
+      <PageMeta
+        title={t('seo.searchTitle')}
+        description={t('seo.searchDescription')}
+        path={`/search${window.location.search}`}
+        noindex
+      />
+      <div className="background-overlay hero-backdrop">
+        <img src={background} alt="Lionel Messi with Argentina" />
       </div>
 
       <Container
+        maxWidth="md"
         sx={{
+          py: { xs: 4, md: 6 },
+          minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
           alignItems: 'center',
-          // height: '100vh',
-          minHeight: '500px',
-          padding: '50px',
           textAlign: 'center',
         }}
       >
-        {/* Top section - non-sticky */}
-        {goals.length <= 10 && <LogoApp />}
         {isMessisBirthday && (
-          <Typography variant="h2" gutterBottom>
-            Happy Birthday Messi!
+          <Typography
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: '1.8rem', sm: '2.4rem' },
+              mb: 2,
+              color: specialColor,
+            }}
+          >
+            {t('search.happyBirthday')}
           </Typography>
         )}
-        
+
         {goals.length === 0 ? (
-          <>
+          <Box
+            sx={{
+              width: '100%',
+              borderRadius: 4,
+              border: `1px solid ${panelBorder}`,
+              backgroundColor: panelBg,
+              backdropFilter: 'blur(14px)',
+              p: { xs: 3, sm: 4 },
+              boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
+            }}
+          >
+            <Typography component="p" className="hero-kicker">
+              {t('search.kicker')}
+            </Typography>
             {specialDateMessage && (
               <Typography
-                variant="h6"
                 sx={{
-                  marginBottom: '16px',
-                  color: mode === 'dark' ? '#FFD700' : '#FF6B00',
-                  fontWeight: 'bold',
+                  mb: 1.5,
+                  color: specialColor,
+                  fontWeight: 700,
                 }}
               >
                 🎉 {specialDateMessage}
               </Typography>
             )}
-            <Typography variant="h4" gutterBottom>
-              No goals found for this date
-            </Typography>
-            <Box>
-              <Button variant="contained" color="primary" sx={{ mr: 2 }} component={Link} to={`/`}>
-                Search Again
-              </Button>
-              <Button variant="contained" color="secondary" onClick={redirectToRandomGoal}>
-                Random
-              </Button>
-            </Box>
-          </>
-        ) : (
-          <>
-            {/* Sticky header for title and sort controls */}
-            <Box
+            <Typography
+              component="h1"
               sx={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 10,
-                backdropFilter: 'blur(10px)',
-                padding: '16px 0',
-                width: '100%',
-                marginBottom: '100px',
-                borderBottom: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                fontSize: { xs: '2rem', sm: '2.6rem' },
+                lineHeight: 1.1,
+                mb: 1.5,
               }}
             >
+              {t('search.noGoalsFound')}
+            </Typography>
+            {filterSummary && (
+              <Typography sx={{ opacity: 0.85, maxWidth: 480, mx: 'auto' }}>{filterSummary}</Typography>
+            )}
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+              sx={{ mt: 3 }}
+            >
+              <button className="cta-ghost" onClick={() => (window.location.href = '/')}>
+                <HomeIcon fontSize="small" />
+                {t('search.searchAgain')}
+              </button>
+              <button className="cta-primary" onClick={redirectToRandomGoal}>
+                <PlayArrow fontSize="small" />
+                {t('search.random')}
+              </button>
+            </Stack>
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ mb: { xs: 3, md: 4 }, width: '100%' }}>
+              <Typography component="p" className="hero-kicker">
+                {t('search.kicker')}
+              </Typography>
               <Typography
-                variant="h4"
-                gutterBottom
+                component="h1"
                 sx={{
-                  marginBottom: '16px',
+                  fontWeight: 800,
+                  letterSpacing: '-0.02em',
+                  fontSize: { xs: '2.2rem', sm: '3rem' },
+                  lineHeight: 1.1,
+                  mb: 1.5,
                 }}
               >
-                Select a Goal
+                <span className="gradient-text">{goals.length}</span>{' '}
+                {t(goals.length === 1 ? 'search.goalLabel' : 'search.goalsLabel')}
               </Typography>
-              {specialDateMessage && (
-                <Typography
-                  variant="h6"
-                  sx={{
-                    marginBottom: '16px',
-                    color: mode === 'dark' ? '#FFD700' : '#FF6B00',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  🎉 {specialDateMessage}
+              {filterSummary && (
+                <Typography sx={{ opacity: 0.85, mb: specialDateMessage ? 1.5 : 0, maxWidth: 520, mx: 'auto' }}>
+                  {filterSummary}
                 </Typography>
               )}
-              <ToggleButtonGroup
-                value={sortBy}
-                exclusive
-                onChange={handleSortChange}
-                aria-label="sort by"
-                color="primary"
-              >
-                <ToggleButton value="number" aria-label="sort by goal number">
-                  Sort by Goal Number
-                </ToggleButton>
-                <ToggleButton value="date" aria-label="sort by date">
-                  Sort by Date
-                </ToggleButton>
-              </ToggleButtonGroup>
+              {specialDateMessage && (
+                <Typography sx={{ color: specialColor, fontWeight: 700 }}>🎉 {specialDateMessage}</Typography>
+              )}
             </Box>
 
-            <SearchGridApp goals={goals} />
+            <Box
+              sx={{
+                width: '100%',
+                borderRadius: 4,
+                border: `1px solid ${panelBorder}`,
+                backgroundColor: panelBg,
+                backdropFilter: 'blur(14px)',
+                p: { xs: 2.5, sm: 3.5 },
+                boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
+                mb: 3,
+              }}
+            >
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={1.5}
+                justifyContent="center"
+                alignItems="center"
+                sx={{ mb: 3 }}
+              >
+                <ToggleButtonGroup
+                  value={sortBy}
+                  exclusive
+                  onChange={handleSortChange}
+                  aria-label={t('search.sortBy')}
+                  size="small"
+                  sx={{
+                    '& .MuiToggleButton-root': {
+                      color: 'inherit',
+                      borderColor: 'rgba(255,255,255,0.25)',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      px: 2,
+                      '&.Mui-selected': {
+                        color: '#06131a',
+                        bgcolor: '#1fc3e7',
+                        borderColor: '#1fc3e7',
+                        '&:hover': {
+                          bgcolor: '#4fd8f5',
+                        },
+                      },
+                    },
+                  }}
+                >
+                  <ToggleButton value="number" aria-label={t('search.sortByNumber')}>
+                    {t('search.sortByNumber')}
+                  </ToggleButton>
+                  <ToggleButton value="date" aria-label={t('search.sortByDate')}>
+                    {t('search.sortByDate')}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+
+                {goals.length > 1 && (
+                  <button
+                    className="cta-secondary"
+                    onClick={playAllResults}
+                    style={{ width: 'auto', minWidth: 120, padding: '6px 16px', fontSize: '0.85rem' }}
+                  >
+                    <PlayArrow sx={{ fontSize: 16 }} />
+                    {t('search.viewAll')}
+                  </button>
+                )}
+              </Stack>
+
+              <SearchGridApp goals={goals} />
+            </Box>
+
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" alignItems="center">
+              <button className="cta-ghost" onClick={() => (window.location.href = '/')}>
+                <HomeIcon fontSize="small" />
+                {t('search.searchAgain')}
+              </button>
+              {goals.length > 1 ? (
+                <button className="cta-primary" onClick={playAllResults}>
+                  <PlayArrow fontSize="small" />
+                  {t('search.viewAll')}
+                </button>
+              ) : (
+                <button className="cta-primary" onClick={redirectToRandomGoal}>
+                  <PlayArrow fontSize="small" />
+                  {t('search.random')}
+                </button>
+              )}
+            </Stack>
           </>
         )}
-      
       </Container>
     </>
   );

@@ -1,21 +1,98 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1fc3e7" />
-    <meta name="description" content="Explore every goal from Lionel Messi's legendary career" />
-    
-    <!-- Apple Mobile Web App Capable -->
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta
+      name="description"
+      content="Reviví los 919 goles de Lionel Messi (2005–2026) en video. Buscá por fecha, club, competencia, rival o número de gol."
+    />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Todos los goles de Messi" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:title" content="Todos los goles de Messi — 919 goles en un archivo" />
+    <meta
+      property="og:description"
+      content="Reviví los 919 goles de Lionel Messi (2005–2026) en video. Buscá por fecha, club, competencia, rival o número de gol."
+    />
+    <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Todos los goles de Messi — archivo de goles en video" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Todos los goles de Messi — 919 goles en un archivo" />
+    <meta
+      name="twitter:description"
+      content="Reviví los 919 goles de Lionel Messi (2005–2026) en video. Buscá por fecha, club, competencia, rival o número de gol."
+    />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/og.png" />
+
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Messi GOAT" />
-    
-    <title>Messi GOAT 🐐⚽</title>
+    <meta name="apple-mobile-web-app-title" content="Goles Messi" />
+
+    <title>Todos los goles de Messi — 919 goles en un archivo</title>
+
+    <script type="application/ld+json" id="website-json-ld">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Todos los goles de Messi",
+        "alternateName": ["All of Messi's goals", "Goles Messi"],
+        "url": "%VITE_SITE_URL%/",
+        "description": "Archivo con los 919 goles de Lionel Messi en video. Buscá por fecha, club, rival o número de gol.",
+        "inLanguage": ["es", "en"],
+        "about": {
+          "@type": "Person",
+          "name": "Lionel Messi",
+          "alternateName": "Leo Messi"
+        },
+        "publisher": {
+          "@type": "Person",
+          "name": "Marco Porracin",
+          "url": "https://porracin.com/"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "%VITE_SITE_URL%/search?team={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main>
+        <h1>Todos los goles de Messi</h1>
+        <p>
+          Archivo con los 919 goles de la carrera de Lionel Messi (2005–2026) en un solo lugar.
+          Incluye goles con Barcelona, Argentina, PSG e Inter Miami.
+        </p>
+        <p>
+          Buscá por fecha, club, competencia, rival o número de gol; mirá un gol al azar; o
+          recorré el feed completo.
+        </p>
+        <ul>
+          <li><a href="/">Inicio y buscador</a></li>
+          <li><a href="/feed">Feed de goles</a></li>
+          <li><a href="/goal/1">Primer gol (#1)</a></li>
+          <li><a href="/goal/919">Último gol (#919)</a></li>
+          <li><a href="/llms.txt">Resumen para asistentes de IA (llms.txt)</a></li>
+          <li><a href="/sitemap.xml">Sitemap</a></li>
+        </ul>
+        <p>Hecho por <a href="https://porracin.com/">Marco Porracin</a>.</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

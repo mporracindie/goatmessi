@@ -8,38 +8,41 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'logo.png'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'og.png', 'llms.txt'],
       manifest: {
-        name: 'Messi GOAT',
-        short_name: 'Messi GOAT',
-        description: 'Explore every goal from Lionel Messi\'s legendary career',
+        name: 'Todos los goles de Messi',
+        short_name: 'Goles Messi',
+        description:
+          'Reviví los 919 goles de Lionel Messi (2005–2026) en video. Buscá por fecha, club, rival o número.',
         theme_color: '#1fc3e7',
         background_color: '#000000',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
         start_url: '/',
+        lang: 'es',
         icons: [
           {
-            src: 'logo.png',
+            src: 'icons/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'logo.png',
+            src: 'icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: 'logo.png',
+            src: 'icons/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'maskable',
           },
         ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
+        navigateFallbackDenylist: [/^\/goal\//, /^\/sitemap\.xml$/, /^\/llms\.txt$/, /^\/robots\.txt$/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/messi\.aws\.porracin\.com\/.*/i,

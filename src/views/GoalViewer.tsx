@@ -1,75 +1,124 @@
-// src/Goal.tsx
 import React from 'react';
-import { useThemeContext } from '../context/ThemeContext';
-import { Box, Typography, Tooltip } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useLocale } from '../context/LocaleContext';
+import { Box, Typography, Tooltip, Stack } from '@mui/material';
+import { PlayArrow, Home as HomeIcon } from '@mui/icons-material';
 import { getGoalByNumber, getRandomGoal } from '../helpers/goals';
-import background from '../assets/la10.jpg';
-import background_dark from '../assets/la10_negra.jpg';
+import { buildGoalVideoJsonLd } from '../helpers/seo';
+import background from '../assets/messi_argentina_dark.jpg';
 import { isSpecialDate } from '../helpers/specialDates';
+import { TranslationKey } from '../i18n/translations';
+import PageMeta from '../components/PageMeta';
+import VideoWatermark from '../components/VideoWatermark';
+
+const specialColor = '#FFD700';
 
 const Goal: React.FC = () => {
-  const { mode } = useThemeContext();
+  const { locale, t } = useLocale();
 
-  // get the goal number from the URL
   const goalNumber = window.location.pathname.split('/').pop();
 
   const goal = getGoalByNumber(goalNumber || '');
-  if (!goal.date) {
-    // redirect to the home page if the goal is not found
+  if (!goal?.date) {
     window.location.href = '/';
     return null;
   }
 
-  const specialMessage = isSpecialDate(goal.date);
+  const specialMessage = isSpecialDate(goal.date, locale);
   const isSpecial = !!specialMessage;
+
+  const translateMeta = (value: string | null) => {
+    if (!value) return '';
+    const key = `goalMeta.${value}` as TranslationKey;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
 
   const redirectToRandomGoal = () => {
     window.location.href = `/goal/${getRandomGoal()}`;
   };
 
+  const goalNo = Number(goal.goalNumber);
   const videoSrc = `https://messi.aws.porracin.com/${goal.goalNumber}_${goal.date}.mp4`;
+  const goalTitle = t('seo.goalTitle', {
+    number: goalNo,
+    team: goal.team,
+    opponent: goal.opponent,
+  });
+  const goalDescription = t('seo.goalDescription', {
+    number: goalNo,
+    date: goal.date,
+    team: goal.team,
+    result: goal.result,
+    opponent: goal.opponent,
+    competition: goal.competition,
+    minute: String(goal.minute),
+  });
+
   return (
     <>
-      <div className="background-overlay">
-        <img src={mode === 'dark' ? background_dark : background} alt="fondo" />
+      <PageMeta
+        title={`${goalTitle} | ${locale === 'es' ? 'Todos los goles de Messi' : "All of Messi's goals"}`}
+        description={goalDescription}
+        path={`/goal/${goalNo}`}
+        type="video.other"
+        jsonLd={buildGoalVideoJsonLd(goal)}
+      />
+      <div className="background-overlay hero-backdrop">
+        <img src={background} alt="Lionel Messi with Argentina" />
       </div>
 
       <div className="container-video">
-        <Tooltip 
-          title={specialMessage || ''} 
-          arrow 
+        <Typography component="p" className="hero-kicker">
+          {t('goal.kicker')}
+        </Typography>
+
+        <Tooltip
+          title={specialMessage || ''}
+          arrow
           placement="top"
           disableHoverListener={!isSpecial}
         >
-          <Typography 
-            variant="h2" 
-            gutterBottom
+          <Typography
+            component="h1"
             sx={{
-              color: isSpecial 
-                ? mode === 'dark' 
-                  ? '#FFD700' 
-                  : '#FF6B00'
-                : 'inherit',
+              fontWeight: 800,
+              letterSpacing: '-0.02em',
+              fontSize: { xs: '2.2rem', sm: '3rem' },
+              lineHeight: 1.1,
+              mb: 0.5,
+              color: isSpecial ? specialColor : 'inherit',
               cursor: isSpecial ? 'pointer' : 'default',
             }}
           >
-            {isSpecial && '⭐ '}Goal #{goalNumber} - {goal.date}
+            {isSpecial && '⭐ '}
+            {t('goal.title', { number: goalNumber || '' })}
           </Typography>
         </Tooltip>
+
+        <Typography sx={{ opacity: 0.85, mb: isSpecial ? 1 : 2, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+          {t('goal.date', { date: goal.date })}
+        </Typography>
+
         {isSpecial && (
-          <Typography 
-            variant="h6" 
-            gutterBottom
+          <Typography
             sx={{
-              color: mode === 'dark' ? '#FFD700' : '#FF6B00',
-              marginTop: '-10px',
-              marginBottom: '20px',
+              color: specialColor,
+              fontWeight: 700,
+              mb: 2,
             }}
           >
             🎉 {specialMessage}
           </Typography>
         )}
+
+        {goal.competition && (
+          <Typography sx={{ opacity: 0.9, mb: 3, maxWidth: 560 }}>
+            {goal.team} {goal.result} {goal.opponent} · {goal.competition} · {goal.minute}&apos;
+            {goal.type ? ` · ${translateMeta(goal.type)}` : ''}
+            {goal.how ? ` · ${translateMeta(goal.how)}` : ''}
+          </Typography>
+        )}
+
         <Box
           sx={{
             width: '100%',
@@ -77,8 +126,10 @@ const Goal: React.FC = () => {
             position: 'relative',
             mb: 4,
             backgroundColor: 'black',
-            borderRadius: '10px',
+            borderRadius: '16px',
             border: 'none',
+            overflow: 'hidden',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
           }}
         >
           <video
@@ -86,6 +137,7 @@ const Goal: React.FC = () => {
             autoPlay
             loop
             controls
+            controlsList="nodownload"
             style={{
               position: 'absolute',
               top: 0,
@@ -93,28 +145,21 @@ const Goal: React.FC = () => {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              borderRadius: '10px',
             }}
           />
+          <VideoWatermark bottom={48} />
         </Box>
-        <Box>
-          <Link
-            className={
-              mode === 'dark'
-                ? 'link-btn-video outline-button btn-celeste '
-                : 'normal-button btn-normal-celeste link-btn-video '
-            }
-            to={`/`}
-          >
-            <span>SEARCH AGAIN</span>
-          </Link>
-          <button
-            className={mode === 'dark' ? 'outline-button btn-violeta ' : 'normal-button btn-normal-violeta'}
-            onClick={redirectToRandomGoal}
-          >
-            <span>RANDOM</span>
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" alignItems="center">
+          <button className="cta-ghost" onClick={() => (window.location.href = '/')}>
+            <HomeIcon fontSize="small" />
+            {t('goal.searchAgain')}
           </button>
-        </Box>
+          <button className="cta-primary" onClick={redirectToRandomGoal}>
+            <PlayArrow fontSize="small" />
+            {t('goal.random')}
+          </button>
+        </Stack>
       </div>
     </>
   );

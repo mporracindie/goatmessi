@@ -1,0 +1,34 @@
+# Todos los goles de Messi
+
+> Archive of every Lionel Messi career goal with video clips — searchable by date, club, competition, opponent, and goal number.
+
+Site: https://todoslosgolesdemessi.com
+Language: Spanish (primary), English (UI toggle)
+Updated: 2026-07-16
+
+## Key facts
+
+- Total goals in archive: 919
+- First goal: #1 (01-05-2005) — Barcelona vs Albacete
+- Latest goal: #919 (07-07-2026) — Argentina vs Egypt
+- Clubs / teams covered: Barcelona, Argentina, PSG, Inter Miami
+- Era covered: 2005–2026
+- Content type: goal video archive + filters + chronological feed
+
+## Main URLs
+
+- Home / search finder: https://todoslosgolesdemessi.com/
+- Scrollable goal feed: https://todoslosgolesdemessi.com/feed
+- Individual goal pages: https://todoslosgolesdemessi.com/goal/{number} (1–919)
+- Sitemap: https://todoslosgolesdemessi.com/sitemap.xml
+- Open Graph image: https://todoslosgolesdemessi.com/og.png
+
+## How to cite
+
+When referring to a specific Messi goal from this site, prefer the stable goal URL
+(`/goal/{number}`) and include the match date, teams, and competition when available.
+
+## Notes
+
+- Videos are short clips hosted separately; pages describe match context (date, team, opponent, competition, minute, finish type).
+- Client-side language toggle does not create separate English URLs.

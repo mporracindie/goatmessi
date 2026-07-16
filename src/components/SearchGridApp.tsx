@@ -1,44 +1,45 @@
 import { Link } from 'react-router-dom';
-import { useThemeContext } from '../context/ThemeContext';
+import { useLocale } from '../context/LocaleContext';
 import { Goal } from '../types/Goal';
 import { isSpecialDate } from '../helpers/specialDates';
 import { Tooltip } from '@mui/material';
+import { TranslationKey } from '../i18n/translations';
 
-const SearchGridApp = ({ goals }: any) => {
-  const { mode } = useThemeContext();
+const SearchGridApp = ({ goals }: { goals: Goal[] }) => {
+  const { locale, t } = useLocale();
+
+  const translateMeta = (value: string | null) => {
+    if (!value) return null;
+    const key = `goalMeta.${value}` as TranslationKey;
+    const translated = t(key);
+    return translated === key ? value : translated;
+  };
+
+  const formatGoalLabel = (goal: Goal) => {
+    const number = parseInt(goal.goalNumber);
+    const match = goal.team && goal.opponent ? `${goal.team} vs ${goal.opponent}` : null;
+    const detail = [translateMeta(goal.type), translateMeta(goal.how)].filter(Boolean).join(' · ');
+
+    return [number, goal.date, match, detail].filter(Boolean).join(' · ');
+  };
+
   return (
-    <div className="container">
+    <div className="goals-grid">
       {goals.map((goal: Goal) => {
-        const specialMessage = isSpecialDate(goal.date);
+        const specialMessage = isSpecialDate(goal.date, locale);
         const isSpecial = !!specialMessage;
-        
+        const label = formatGoalLabel(goal);
+
         return (
-          <div className="grid" key={goal.goalNumber}>
-            <Tooltip 
-              title={specialMessage || ''} 
-              arrow 
-              placement="top"
-              disableHoverListener={!isSpecial}
+          <Tooltip key={goal.goalNumber} title={specialMessage || label} arrow placement="top">
+            <Link
+              className={`goal-chip link-btn-video${isSpecial ? ' goal-chip-special' : ''}`}
+              to={`/goal/${goal.goalNumber}`}
             >
-              <Link
-                className={
-                  isSpecial
-                    ? mode === 'dark'
-                      ? 'link-btn-video outline-button btn-special-gold'
-                      : 'normal-button btn-normal-special-orange link-btn-video'
-                    : mode === 'dark'
-                    ? 'link-btn-video outline-button btn-celeste '
-                    : 'normal-button btn-normal-celeste link-btn-video '
-                }
-                to={`/goal/${goal.goalNumber}`}
-              >
-                <span>
-                  {isSpecial && '⭐ '}
-                  {parseInt(goal.goalNumber)} - {goal.date}
-                </span>
-              </Link>
-            </Tooltip>
-          </div>
+              {isSpecial && '⭐ '}
+              {label}
+            </Link>
+          </Tooltip>
         );
       })}
     </div>
