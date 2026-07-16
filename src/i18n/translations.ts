@@ -107,6 +107,7 @@ export const translations = {
       language: 'Language',
       english: 'English',
       spanish: 'Español',
+      clear: 'Clear',
       builtBy: 'Built by',
       archiveBlurb:
         "Video archive of Lionel Messi's career goals (Barcelona, Argentina, PSG, Inter Miami).",
@@ -248,6 +249,7 @@ export const translations = {
       language: 'Idioma',
       english: 'English',
       spanish: 'Español',
+      clear: 'Limpiar',
       builtBy: 'Hecho por',
       archiveBlurb:
         'Archivo en video de los goles de Lionel Messi (Barcelona, Argentina, PSG, Inter Miami).',

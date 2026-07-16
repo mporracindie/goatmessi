@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Box, Typography, IconButton, Tooltip, Switch, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import {
-  ArrowBack as ArrowBackIcon,
-  Fullscreen as FullscreenIcon,
-  FullscreenExit as FullscreenExitIcon,
-} from '@mui/icons-material';
+import { ArrowLeft, Maximize, Minimize } from 'lucide-react';
 import { getGoalByNumber, getRandomGoal } from '../helpers/goals';
 import { isSpecialDate } from '../helpers/specialDates';
 import { useLocale } from '../context/LocaleContext';
 import { loadPlaylist, loadPlaylistReturnUrl, PlaylistGoal } from '../helpers/playlist';
 import PageMeta from '../components/PageMeta';
 import VideoWatermark from '../components/VideoWatermark';
+import { Button } from '../components/ui/button';
+import { Switch } from '../components/ui/switch';
+import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../components/ui/tooltip';
+import { cn } from '../lib/utils';
 
 interface FeedGoal {
   id: string;
@@ -114,20 +114,20 @@ const FeedItem: React.FC<{
     ? `https://messi.aws.porracin.com/${item.goalNumber}_${item.date}.mp4`
     : undefined;
 
-  return (
-    <Box
-      sx={{
-        height: '100dvh',
-        width: '100%',
-        position: 'relative',
-        scrollSnapAlign: 'start',
-        backgroundColor: 'black',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-      }}
+  const title = (
+    <div
+      className={cn(
+        'flex items-center gap-2 text-[1.6rem] leading-[1.15] font-extrabold tracking-tight sm:text-[2rem]',
+        isSpecial ? 'text-[#FFD700]' : 'text-white',
+      )}
     >
+      {isSpecial && '⭐ '}
+      {t('feed.goalTitle', { number: parseInt(item.goalNumber, 10) })}
+    </div>
+  );
+
+  return (
+    <div className="relative flex h-dvh w-full snap-start items-center justify-center overflow-hidden bg-black">
       <video
         ref={videoRef}
         src={videoSrc}
@@ -136,11 +136,7 @@ const FeedItem: React.FC<{
         playsInline
         muted={false}
         controls={false}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain',
-        }}
+        className="size-full object-contain"
         onEnded={handleEnded}
         onClick={() => {
           if (videoRef.current?.paused) {
@@ -151,46 +147,28 @@ const FeedItem: React.FC<{
         }}
       />
 
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 80,
-          left: 20,
-          right: 20,
-          color: 'white',
-          textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
-          zIndex: 10,
-          pointerEvents: 'none',
-          opacity: uiVisible ? 1 : 0,
-          transition: 'opacity 0.35s ease',
-        }}
-      >
-        <Tooltip title={specialMessage || ''} arrow placement="top" disableHoverListener={!isSpecial}>
-          <Typography
-            component="div"
-            sx={{
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              fontSize: { xs: '1.6rem', sm: '2rem' },
-              lineHeight: 1.15,
-              color: isSpecial ? '#FFD700' : 'white',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            {isSpecial && '⭐ '}
-            {t('feed.goalTitle', { number: parseInt(item.goalNumber, 10) })}
-          </Typography>
-        </Tooltip>
-        <Typography sx={{ opacity: 0.85, mt: 0.5, fontSize: '1rem' }}>{item.date}</Typography>
-        {isSpecial && (
-          <Typography sx={{ color: '#FFD700', fontWeight: 700, mt: 0.75 }}>🎉 {specialMessage}</Typography>
+      <div
+        className={cn(
+          'pointer-events-none absolute right-5 bottom-20 left-5 z-10 text-white transition-opacity duration-300 [text-shadow:1px_1px_3px_rgba(0,0,0,0.8)]',
+          uiVisible ? 'opacity-100' : 'opacity-0',
         )}
-      </Box>
+      >
+        {isSpecial ? (
+          <Tooltip>
+            <TooltipTrigger asChild>{title}</TooltipTrigger>
+            <TooltipContent side="top">{specialMessage}</TooltipContent>
+          </Tooltip>
+        ) : (
+          title
+        )}
+        <p className="mt-1 text-base opacity-85">{item.date}</p>
+        {isSpecial && (
+          <p className="mt-2 font-bold text-[#FFD700]">🎉 {specialMessage}</p>
+        )}
+      </div>
 
       <VideoWatermark />
-    </Box>
+    </div>
   );
 };
 
@@ -400,10 +378,6 @@ const Feed: React.FC = () => {
     navigate(isPlaylist ? returnUrlRef.current : '/');
   };
 
-  const handleViewsChange = (_: React.MouseEvent<HTMLElement>, value: ViewsPerGoal | null) => {
-    if (value) setViewsPerGoal(value);
-  };
-
   const toggleFullscreen = async () => {
     const root = rootRef.current;
     if (!root) return;
@@ -423,195 +397,125 @@ const Feed: React.FC = () => {
     return null;
   }
 
-  const chromeSx = {
-    opacity: uiVisible ? 1 : 0,
-    pointerEvents: uiVisible ? ('auto' as const) : ('none' as const),
-    transition: 'opacity 0.35s ease',
-  };
+  const chromeClass = cn(
+    'transition-opacity duration-300',
+    uiVisible ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
+  );
 
   return (
-    <Box
+    <div
       ref={rootRef}
-      sx={{
-        width: '100vw',
-        height: '100dvh',
-        backgroundColor: 'black',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 1300,
-        cursor: uiVisible ? 'default' : 'none',
-      }}
+      className={cn(
+        'fixed top-0 left-0 z-[1300] h-dvh w-screen bg-black',
+        uiVisible ? 'cursor-default' : 'cursor-none',
+      )}
     >
       <PageMeta
         title={t('seo.feedTitle')}
         description={t('seo.feedDescription')}
         path="/feed"
       />
-      <IconButton
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
         onClick={handleBack}
         aria-label="Back"
-        sx={{
-          position: 'absolute',
-          top: 20,
-          left: 20,
-          zIndex: 20,
-          color: 'white',
-          backgroundColor: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.35)',
-          backdropFilter: 'blur(8px)',
-          ...chromeSx,
-          '&:hover': {
-            backgroundColor: 'rgba(255,255,255,0.14)',
-            borderColor: 'rgba(255,255,255,0.6)',
-          },
-        }}
+        className={cn(
+          'absolute top-5 left-5 z-20 border border-white/35 bg-white/6 text-white backdrop-blur-md hover:border-white/60 hover:bg-white/14 hover:text-white',
+          chromeClass,
+        )}
       >
-        <ArrowBackIcon />
-      </IconButton>
+        <ArrowLeft />
+      </Button>
 
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 20,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          gap: 1,
-          ...chromeSx,
-        }}
-      >
+      <div className={cn('absolute top-4 right-4 z-20 flex flex-col items-end gap-2', chromeClass)}>
         {isPlaylist && goals.length > 0 && (
-          <Typography
-            sx={{
-              color: 'white',
-              fontWeight: 700,
-              letterSpacing: '0.06em',
-              fontSize: '0.85rem',
-              opacity: 0.85,
-              textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
-              mr: 0.5,
-            }}
-          >
+          <p className="mr-1 text-sm font-bold tracking-wide text-white opacity-85 [text-shadow:1px_1px_3px_rgba(0,0,0,0.8)]">
             {t('feed.progress', { current: activeIndex + 1, total: goals.length })}
-          </Typography>
+          </p>
         )}
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            px: 1.25,
-            py: 0.5,
-            borderRadius: 2,
-            backgroundColor: 'rgba(0,0,0,0.45)',
-            border: '1px solid rgba(255,255,255,0.35)',
-            backdropFilter: 'blur(8px)',
-            color: 'white',
-          }}
-        >
-          <Tooltip title={t('feed.autoAdvance')} arrow>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography
-                component="label"
-                htmlFor="feed-auto-advance"
-                sx={{
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.04em',
-                  opacity: 0.9,
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {t('feed.autoAdvance')}
-              </Typography>
-              <Switch
-                id="feed-auto-advance"
-                size="small"
-                checked={autoAdvance}
-                onChange={(_, checked) => setAutoAdvance(checked)}
-                sx={{
-                  ml: 0.25,
-                  '& .MuiSwitch-switchBase.Mui-checked': { color: '#1fc3e7' },
-                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                    backgroundColor: '#1fc3e7',
-                  },
-                }}
-              />
-            </Box>
+        <div className="flex items-center gap-2 rounded-lg border border-white/35 bg-black/45 px-3 py-1.5 text-white backdrop-blur-md">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <label
+                  htmlFor="feed-auto-advance"
+                  className="cursor-pointer text-xs font-bold tracking-wide whitespace-nowrap opacity-90 select-none"
+                >
+                  {t('feed.autoAdvance')}
+                </label>
+                <Switch
+                  id="feed-auto-advance"
+                  checked={autoAdvance}
+                  onCheckedChange={setAutoAdvance}
+                  className="data-[state=checked]:bg-primary"
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>{t('feed.autoAdvance')}</TooltipContent>
           </Tooltip>
 
           {autoAdvance && (
-            <Tooltip title={t('feed.viewsPerGoal')} arrow>
-              <ToggleButtonGroup
-                exclusive
-                size="small"
-                value={viewsPerGoal}
-                onChange={handleViewsChange}
-                aria-label={t('feed.viewsPerGoal')}
-                sx={{
-                  '& .MuiToggleButton-root': {
-                    color: 'rgba(255,255,255,0.75)',
-                    borderColor: 'rgba(255,255,255,0.35)',
-                    minWidth: 32,
-                    px: 0.75,
-                    py: 0.15,
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    lineHeight: 1.4,
-                  },
-                  '& .MuiToggleButton-root.Mui-selected': {
-                    color: '#06131a',
-                    backgroundColor: '#1fc3e7',
-                    borderColor: '#1fc3e7',
-                    '&:hover': {
-                      backgroundColor: '#1fc3e7',
-                    },
-                  },
-                }}
-              >
-                <ToggleButton value={1} aria-label={t('feed.viewsPerGoalOne')}>
-                  1
-                </ToggleButton>
-                <ToggleButton value={2} aria-label={t('feed.viewsPerGoalTwo')}>
-                  2
-                </ToggleButton>
-              </ToggleButtonGroup>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ToggleGroup
+                  type="single"
+                  value={String(viewsPerGoal)}
+                  onValueChange={(value) => {
+                    if (value === '1' || value === '2') {
+                      setViewsPerGoal(Number(value) as ViewsPerGoal);
+                    }
+                  }}
+                  variant="outline"
+                  size="sm"
+                  spacing={0}
+                  aria-label={t('feed.viewsPerGoal')}
+                >
+                  <ToggleGroupItem
+                    value="1"
+                    aria-label={t('feed.viewsPerGoalOne')}
+                    className="min-w-8 px-2 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
+                    1
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="2"
+                    aria-label={t('feed.viewsPerGoalTwo')}
+                    className="min-w-8 px-2 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
+                    2
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </TooltipTrigger>
+              <TooltipContent>{t('feed.viewsPerGoal')}</TooltipContent>
             </Tooltip>
           )}
 
-          <Tooltip title={isFullscreen ? t('feed.exitFullscreen') : t('feed.fullscreen')} arrow>
-            <IconButton
-              onClick={toggleFullscreen}
-              aria-label={isFullscreen ? t('feed.exitFullscreen') : t('feed.fullscreen')}
-              size="small"
-              sx={{
-                color: 'white',
-                p: 0.5,
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.12)',
-                },
-              }}
-            >
-              {isFullscreen ? <FullscreenExitIcon fontSize="small" /> : <FullscreenIcon fontSize="small" />}
-            </IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? t('feed.exitFullscreen') : t('feed.fullscreen')}
+                className="text-white hover:bg-white/12 hover:text-white"
+              >
+                {isFullscreen ? <Minimize /> : <Maximize />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {isFullscreen ? t('feed.exitFullscreen') : t('feed.fullscreen')}
+            </TooltipContent>
           </Tooltip>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       <div
         ref={containerRef}
-        style={{
-          height: '100%',
-          overflowY: 'scroll',
-          scrollSnapType: 'y mandatory',
-          scrollBehavior: 'smooth',
-        }}
+        className="h-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
       >
         {goals.map((goal, index) => {
           const shouldPreload = shouldPreloadIndex(index, activeIndex, scrollDirection);
@@ -629,7 +533,7 @@ const Feed: React.FC = () => {
           );
         })}
       </div>
-    </Box>
+    </div>
   );
 };
 

@@ -1,14 +1,11 @@
 import React from 'react';
-import { Container } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import 'dayjs/locale/en';
 import LanguageToggle from './components/LanguageToggle';
 import SiteFooter from './components/SiteFooter';
-import { ThemeContextProvider } from './context/ThemeContext';
 import { LocaleProvider, useLocale } from './context/LocaleContext';
+import { TooltipProvider } from './components/ui/tooltip';
 import Home from './views/Home';
 import Goal from './views/GoalViewer';
 import { Routes, Route } from 'react-router';
@@ -26,46 +23,31 @@ const AppShell: React.FC = () => {
   return (
     <div className="content">
       <LanguageToggle />
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
-        <Container
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            minHeight: '100vh',
-            width: '100%',
-            maxWidth: '100% !important',
-            px: { xs: 0, sm: 2 },
-            py: 0,
-            overflowX: 'hidden',
-          }}
-        >
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/goal/:number/" element={<Goal />} />
-              <Route path="/goal/:number" element={<Goal />} />
-              <Route path="/random" element={<Random />} />
-              <Route path="/feed" element={<Feed />} />
-              <Route path="/table" element={<GoalsTable />} />
-            </Routes>
-            <SiteFooter />
-          </BrowserRouter>
-        </Container>
-      </LocalizationProvider>
+      <div className="flex min-h-screen w-full max-w-full flex-col items-center justify-start overflow-x-hidden px-0 sm:px-2">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/goal/:number/" element={<Goal />} />
+            <Route path="/goal/:number" element={<Goal />} />
+            <Route path="/random" element={<Random />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/table" element={<GoalsTable />} />
+          </Routes>
+          <SiteFooter />
+        </BrowserRouter>
+      </div>
     </div>
   );
 };
 
 function App() {
   return (
-    <ThemeContextProvider>
-      <LocaleProvider>
+    <LocaleProvider>
+      <TooltipProvider>
         <AppShell />
-      </LocaleProvider>
-    </ThemeContextProvider>
+      </TooltipProvider>
+    </LocaleProvider>
   );
 }
 

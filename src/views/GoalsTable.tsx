@@ -1,24 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import {
-  Autocomplete,
-  Box,
-  Container,
-  Link,
-  MenuItem,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TableSortLabel,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { Clear, Home as HomeIcon, PlayArrow } from '@mui/icons-material';
+import { ArrowDown, ArrowUp, ArrowUpDown, Home, Play, X } from 'lucide-react';
 import { useLocale } from '../context/LocaleContext';
 import {
   filterGoals,
@@ -29,8 +11,29 @@ import {
 import { savePlaylist } from '../helpers/playlist';
 import { TranslationKey } from '../i18n/translations';
 import PageMeta from '../components/PageMeta';
+import ClearableField from '../components/ClearableField';
 import background from '../assets/messi_argentina_dark.jpg';
 import { Goal } from '../types/Goal';
+import { Combobox } from '../components/ui/combobox';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Button } from '../components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
+import { cn } from '../lib/utils';
 
 const panelBg = 'rgba(10, 12, 16, 0.72)';
 const panelBorder = 'rgba(255, 255, 255, 0.08)';
@@ -50,6 +53,11 @@ const parseMinuteSort = (minute: number | string): number => {
     if (match) return Number(match[1]);
   }
   return -1;
+};
+
+const SortIcon: React.FC<{ active: boolean; dir: SortDir }> = ({ active, dir }) => {
+  if (!active) return <ArrowUpDown className="size-3.5 opacity-50" />;
+  return dir === 'asc' ? <ArrowUp className="size-3.5" /> : <ArrowDown className="size-3.5" />;
 };
 
 const GoalsTable: React.FC = () => {
@@ -114,6 +122,7 @@ const GoalsTable: React.FC = () => {
 
   const pageRows = sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   const filtersActive = hasActiveFilters(filters);
+  const pageCount = Math.max(1, Math.ceil(sorted.length / rowsPerPage));
 
   const clearFilters = () => {
     setTeam('');
@@ -157,23 +166,6 @@ const GoalsTable: React.FC = () => {
     navigate(`/goal/${parseInt(goal.goalNumber, 10)}`);
   };
 
-  const cellSx = {
-    color: 'inherit',
-    borderColor: 'rgba(255,255,255,0.08)',
-    whiteSpace: 'nowrap' as const,
-    fontSize: '0.875rem',
-  };
-
-  const headCellSx = {
-    ...cellSx,
-    fontWeight: 700,
-    backgroundColor: '#14181f',
-    backgroundImage: 'linear-gradient(#14181f, #14181f)',
-    position: 'sticky' as const,
-    top: 0,
-    zIndex: 2,
-  };
-
   return (
     <>
       <PageMeta
@@ -185,167 +177,177 @@ const GoalsTable: React.FC = () => {
         <img src={background} alt="Lionel Messi with Argentina" />
       </div>
 
-      <Container
-        maxWidth="xl"
-        sx={{
-          py: { xs: 4, md: 5 },
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          width: '100%',
-        }}
-      >
-        <Box textAlign="center" mb={3}>
-          <Typography component="p" className="hero-kicker">
-            {t('table.kicker')}
-          </Typography>
-          <Typography
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              fontSize: { xs: '2rem', sm: '2.6rem' },
-              lineHeight: 1.1,
-              mb: 1,
-            }}
-          >
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col items-stretch px-4 py-8 md:py-10">
+        <div className="mb-6 text-center">
+          <p className="hero-kicker">{t('table.kicker')}</p>
+          <h1 className="mb-2 text-[2rem] leading-tight font-extrabold tracking-tight sm:text-[2.6rem]">
             <span className="gradient-text">{sorted.length}</span>{' '}
             {t(sorted.length === 1 ? 'table.goalLabel' : 'table.goalsLabel')}
-          </Typography>
-          <Typography sx={{ opacity: 0.8, maxWidth: 520, mx: 'auto' }}>
-            {t('table.subtitle')}
-          </Typography>
-        </Box>
+          </h1>
+          <p className="mx-auto max-w-[520px] opacity-80">{t('table.subtitle')}</p>
+        </div>
 
-        <Box
-          sx={{
-            width: '100%',
-            borderRadius: 4,
-            border: `1px solid ${panelBorder}`,
-            backgroundColor: panelBg,
-            backdropFilter: 'blur(14px)',
-            p: { xs: 2, sm: 3 },
-            boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-            mb: 2,
-            textAlign: 'left',
-          }}
+        <div
+          className="relative z-20 mb-4 w-full overflow-visible rounded-2xl border p-4 text-left shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px] sm:p-6"
+          style={{ borderColor: panelBorder, backgroundColor: panelBg }}
         >
-          <Stack spacing={1.5}>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-              <TextField
-                select
-                label={t('home.team')}
-                size="small"
-                value={team}
-                onChange={(e) => onFilterChange(setTeam)(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="">{t('home.anyTeam')}</MenuItem>
-                {filterOptions.teams.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Autocomplete
-                options={filterOptions.competitions}
-                value={competition}
-                onChange={(_e, value) => onFilterChange(setCompetition)(value)}
-                renderInput={(params) => (
-                  <TextField {...params} label={t('home.competition')} size="small" />
-                )}
-                fullWidth
-              />
-              <Autocomplete
-                options={filterOptions.opponents}
-                value={opponent}
-                onChange={(_e, value) => onFilterChange(setOpponent)(value)}
-                renderInput={(params) => (
-                  <TextField {...params} label={t('home.opponent')} size="small" />
-                )}
-                fullWidth
-              />
-            </Stack>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 md:flex-row">
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.team')}</Label>
+                <ClearableField
+                  hasValue={Boolean(team)}
+                  onClear={() => onFilterChange(setTeam)('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={team || undefined} onValueChange={onFilterChange(setTeam)}>
+                    <SelectTrigger className={cn('w-full', team && 'pr-14')}>
+                      <SelectValue placeholder={t('home.anyTeam')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.teams.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.competition')}</Label>
+                <Combobox
+                  options={filterOptions.competitions}
+                  value={competition}
+                  onChange={onFilterChange(setCompetition)}
+                  placeholder={t('home.competition')}
+                  clearLabel={t('common.clear')}
+                />
+              </div>
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.opponent')}</Label>
+                <Combobox
+                  options={filterOptions.opponents}
+                  value={opponent}
+                  onChange={onFilterChange(setOpponent)}
+                  placeholder={t('home.opponent')}
+                  clearLabel={t('common.clear')}
+                />
+              </div>
+            </div>
 
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-              <TextField
-                select
-                label={t('home.year')}
-                size="small"
-                value={year}
-                onChange={(e) => onFilterChange(setYear)(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="">{t('table.anyYear')}</MenuItem>
-                {filterOptions.years.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                select
-                label={t('home.goalType')}
-                size="small"
-                value={type}
-                onChange={(e) => onFilterChange(setType)(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="">{t('home.anyType')}</MenuItem>
-                {filterOptions.types.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {translateMeta(option)}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                select
-                label={t('home.scoredWith')}
-                size="small"
-                value={how}
-                onChange={(e) => onFilterChange(setHow)(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="">{t('home.any')}</MenuItem>
-                {filterOptions.hows.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {translateMeta(option)}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                label={t('home.minuteFrom')}
-                type="number"
-                size="small"
-                value={minuteMin}
-                onChange={(e) => onFilterChange(setMinuteMin)(e.target.value)}
-                fullWidth
-                inputProps={{ min: 1, max: 120 }}
-              />
-              <TextField
-                label={t('home.minuteTo')}
-                type="number"
-                size="small"
-                value={minuteMax}
-                onChange={(e) => onFilterChange(setMinuteMax)(e.target.value)}
-                fullWidth
-                inputProps={{ min: 1, max: 120 }}
-              />
-            </Stack>
+            <div className="flex flex-col gap-3 md:flex-row">
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.year')}</Label>
+                <ClearableField
+                  hasValue={Boolean(year)}
+                  onClear={() => onFilterChange(setYear)('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={year || undefined} onValueChange={onFilterChange(setYear)}>
+                    <SelectTrigger className={cn('w-full', year && 'pr-14')}>
+                      <SelectValue placeholder={t('table.anyYear')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.years.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.goalType')}</Label>
+                <ClearableField
+                  hasValue={Boolean(type)}
+                  onClear={() => onFilterChange(setType)('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={type || undefined} onValueChange={onFilterChange(setType)}>
+                    <SelectTrigger className={cn('w-full', type && 'pr-14')}>
+                      <SelectValue placeholder={t('home.anyType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.types.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {translateMeta(option)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.scoredWith')}</Label>
+                <ClearableField
+                  hasValue={Boolean(how)}
+                  onClear={() => onFilterChange(setHow)('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={how || undefined} onValueChange={onFilterChange(setHow)}>
+                    <SelectTrigger className={cn('w-full', how && 'pr-14')}>
+                      <SelectValue placeholder={t('home.any')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.hows.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {translateMeta(option)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.minuteFrom')}</Label>
+                <ClearableField
+                  hasValue={Boolean(minuteMin)}
+                  onClear={() => onFilterChange(setMinuteMin)('')}
+                  clearLabel={t('common.clear')}
+                >
+                  <Input
+                    type="number"
+                    min={1}
+                    max={120}
+                    value={minuteMin}
+                    onChange={(e) => onFilterChange(setMinuteMin)(e.target.value)}
+                    className={cn(minuteMin && 'pr-8')}
+                  />
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t('home.minuteTo')}</Label>
+                <ClearableField
+                  hasValue={Boolean(minuteMax)}
+                  onClear={() => onFilterChange(setMinuteMax)('')}
+                  clearLabel={t('common.clear')}
+                >
+                  <Input
+                    type="number"
+                    min={1}
+                    max={120}
+                    value={minuteMax}
+                    onChange={(e) => onFilterChange(setMinuteMax)(e.target.value)}
+                    className={cn(minuteMax && 'pr-8')}
+                  />
+                </ClearableField>
+              </div>
+            </div>
 
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={1.5}
-              alignItems={{ xs: 'stretch', sm: 'center' }}
-            >
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               {sorted.length > 0 && (
                 <button
                   className="cta-secondary"
                   onClick={playFilteredFeed}
                   style={{ width: 'auto', minWidth: 140, padding: '6px 16px', fontSize: '0.85rem' }}
                 >
-                  <PlayArrow sx={{ fontSize: 16 }} />
+                  <Play className="size-4" />
                   {t('table.playFeed')}
                 </button>
               )}
@@ -355,149 +357,160 @@ const GoalsTable: React.FC = () => {
                   onClick={clearFilters}
                   style={{ width: 'auto', minWidth: 120, padding: '6px 16px', fontSize: '0.85rem' }}
                 >
-                  <Clear sx={{ fontSize: 16 }} />
+                  <X className="size-4" />
                   {t('table.clearFilters')}
                 </button>
               )}
-            </Stack>
-          </Stack>
-        </Box>
+            </div>
+          </div>
+        </div>
 
-        <Box
-          sx={{
-            width: '100%',
-            borderRadius: 4,
-            border: `1px solid ${panelBorder}`,
-            backgroundColor: panelBg,
-            backdropFilter: 'blur(14px)',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-            overflow: 'hidden',
-            mb: 3,
-          }}
+        <div
+          className="relative z-0 mb-6 w-full overflow-hidden rounded-2xl border shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px]"
+          style={{ borderColor: panelBorder, backgroundColor: panelBg }}
         >
           {sorted.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography sx={{ fontWeight: 700, mb: 1 }}>{t('table.noGoalsFound')}</Typography>
-              <Typography sx={{ opacity: 0.75, mb: 2 }}>{t('table.tryClearing')}</Typography>
+            <div className="p-8 text-center">
+              <p className="mb-1 font-bold">{t('table.noGoalsFound')}</p>
+              <p className="mb-4 opacity-75">{t('table.tryClearing')}</p>
               <button className="cta-ghost" onClick={clearFilters} style={{ width: 'auto' }}>
-                <Clear fontSize="small" />
+                <X className="size-4" />
                 {t('table.clearFilters')}
               </button>
-            </Box>
+            </div>
           ) : (
             <>
-              <TableContainer sx={{ maxHeight: { xs: '60vh', md: '65vh' } }}>
-                <Table stickyHeader size="small" aria-label={t('table.kicker')}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={headCellSx} sortDirection={sortField === 'goalNumber' ? sortDir : false}>
-                        <TableSortLabel
-                          active={sortField === 'goalNumber'}
-                          direction={sortField === 'goalNumber' ? sortDir : 'asc'}
-                          onClick={() => handleSort('goalNumber')}
-                          sx={{ color: 'inherit !important', '& .MuiTableSortLabel-icon': { color: 'inherit !important' } }}
+              <div className="max-h-[60vh] overflow-auto md:max-h-[65vh]">
+                <Table aria-label={t('table.kicker')}>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      {(
+                        [
+                          { field: 'goalNumber' as const, label: t('table.colNumber'), sortable: true },
+                          { field: 'date' as const, label: t('table.colDate'), sortable: true },
+                          { field: null, label: t('table.colTeam'), sortable: false },
+                          { field: null, label: t('table.colOpponent'), sortable: false },
+                          { field: null, label: t('table.colCompetition'), sortable: false },
+                          { field: 'minute' as const, label: t('table.colMinute'), sortable: true },
+                          { field: null, label: t('table.colResult'), sortable: false },
+                          { field: null, label: t('table.colScore'), sortable: false },
+                          { field: null, label: t('table.colType'), sortable: false },
+                          { field: null, label: t('table.colHow'), sortable: false },
+                        ] as const
+                      ).map((col) => (
+                        <TableHead
+                          key={col.label}
+                          className="sticky top-0 z-[2] bg-[#14181f] text-foreground"
                         >
-                          {t('table.colNumber')}
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell sx={headCellSx} sortDirection={sortField === 'date' ? sortDir : false}>
-                        <TableSortLabel
-                          active={sortField === 'date'}
-                          direction={sortField === 'date' ? sortDir : 'asc'}
-                          onClick={() => handleSort('date')}
-                          sx={{ color: 'inherit !important', '& .MuiTableSortLabel-icon': { color: 'inherit !important' } }}
-                        >
-                          {t('table.colDate')}
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colTeam')}</TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colOpponent')}</TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colCompetition')}</TableCell>
-                      <TableCell sx={headCellSx} sortDirection={sortField === 'minute' ? sortDir : false}>
-                        <TableSortLabel
-                          active={sortField === 'minute'}
-                          direction={sortField === 'minute' ? sortDir : 'asc'}
-                          onClick={() => handleSort('minute')}
-                          sx={{ color: 'inherit !important', '& .MuiTableSortLabel-icon': { color: 'inherit !important' } }}
-                        >
-                          {t('table.colMinute')}
-                        </TableSortLabel>
-                      </TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colResult')}</TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colScore')}</TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colType')}</TableCell>
-                      <TableCell sx={headCellSx}>{t('table.colHow')}</TableCell>
+                          {col.sortable && col.field ? (
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 font-bold hover:text-primary"
+                              onClick={() => handleSort(col.field)}
+                            >
+                              {col.label}
+                              <SortIcon active={sortField === col.field} dir={sortDir} />
+                            </button>
+                          ) : (
+                            <span className="font-bold">{col.label}</span>
+                          )}
+                        </TableHead>
+                      ))}
                     </TableRow>
-                  </TableHead>
+                  </TableHeader>
                   <TableBody>
                     {pageRows.map((goal) => (
                       <TableRow
                         key={goal.goalNumber}
-                        hover
+                        className="cursor-pointer hover:bg-[rgba(31,195,231,0.08)]"
                         onClick={() => openGoal(goal)}
-                        sx={{
-                          cursor: 'pointer',
-                          '&:hover': { backgroundColor: 'rgba(31, 195, 231, 0.08)' },
-                        }}
                       >
-                        <TableCell sx={{ ...cellSx, fontWeight: 700 }}>
-                          <Link
-                            component={RouterLink}
+                        <TableCell className="font-bold whitespace-nowrap">
+                          <RouterLink
                             to={`/goal/${parseInt(goal.goalNumber, 10)}`}
                             onClick={(e) => e.stopPropagation()}
-                            underline="hover"
-                            sx={{ color: '#1fc3e7', fontWeight: 700 }}
+                            className="font-bold text-primary hover:underline"
                           >
                             {parseInt(goal.goalNumber, 10)}
-                          </Link>
+                          </RouterLink>
                         </TableCell>
-                        <TableCell sx={cellSx}>{goal.date}</TableCell>
-                        <TableCell sx={cellSx}>{goal.team}</TableCell>
-                        <TableCell sx={cellSx}>{goal.opponent}</TableCell>
-                        <TableCell sx={{ ...cellSx, whiteSpace: 'normal', minWidth: 140 }}>
-                          {goal.competition}
-                        </TableCell>
-                        <TableCell sx={cellSx}>{goal.minute}</TableCell>
-                        <TableCell sx={cellSx}>{goal.result || '—'}</TableCell>
-                        <TableCell sx={cellSx}>{goal.scoreAtGoal || '—'}</TableCell>
-                        <TableCell sx={cellSx}>{translateMeta(goal.type)}</TableCell>
-                        <TableCell sx={cellSx}>{translateMeta(goal.how)}</TableCell>
+                        <TableCell className="whitespace-nowrap">{goal.date}</TableCell>
+                        <TableCell className="whitespace-nowrap">{goal.team}</TableCell>
+                        <TableCell className="whitespace-nowrap">{goal.opponent}</TableCell>
+                        <TableCell className="min-w-[140px]">{goal.competition}</TableCell>
+                        <TableCell className="whitespace-nowrap">{goal.minute}</TableCell>
+                        <TableCell className="whitespace-nowrap">{goal.result || '—'}</TableCell>
+                        <TableCell className="whitespace-nowrap">{goal.scoreAtGoal || '—'}</TableCell>
+                        <TableCell className="whitespace-nowrap">{translateMeta(goal.type)}</TableCell>
+                        <TableCell className="whitespace-nowrap">{translateMeta(goal.how)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-              </TableContainer>
-              <TablePagination
-                component="div"
-                count={sorted.length}
-                page={page}
-                onPageChange={(_e, newPage) => setPage(newPage)}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={(e) => {
-                  setRowsPerPage(parseInt(e.target.value, 10));
-                  setPage(0);
-                }}
-                rowsPerPageOptions={[25, 50, 100]}
-                labelRowsPerPage={t('table.rowsPerPage')}
-                sx={{
-                  color: 'inherit',
-                  borderTop: `1px solid ${panelBorder}`,
-                  '.MuiTablePagination-selectIcon': { color: 'inherit' },
-                  '.MuiIconButton-root': { color: 'inherit' },
-                  '.Mui-disabled': { color: 'rgba(255,255,255,0.3) !important' },
-                }}
-              />
+              </div>
+              <div
+                className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 text-sm sm:flex-row"
+                style={{ borderColor: panelBorder }}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="opacity-80">{t('table.rowsPerPage')}</span>
+                  <Select
+                    value={String(rowsPerPage)}
+                    onValueChange={(value) => {
+                      setRowsPerPage(parseInt(value, 10));
+                      setPage(0);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-[80px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[25, 50, 100].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="opacity-80">
+                    {page * rowsPerPage + 1}–
+                    {Math.min((page + 1) * rowsPerPage, sorted.length)} / {sorted.length}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={page === 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    className={cn(page === 0 && 'opacity-40')}
+                  >
+                    ‹
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={page >= pageCount - 1}
+                    onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                    className={cn(page >= pageCount - 1 && 'opacity-40')}
+                  >
+                    ›
+                  </Button>
+                </div>
+              </div>
             </>
           )}
-        </Box>
+        </div>
 
-        <Stack direction="row" justifyContent="center">
+        <div className="flex justify-center">
           <button className="cta-ghost" onClick={() => navigate('/')}>
-            <HomeIcon fontSize="small" />
+            <Home className="size-4" />
             {t('table.backHome')}
           </button>
-        </Stack>
-      </Container>
+        </div>
+      </div>
     </>
   );
 };

@@ -1,41 +1,42 @@
 import React from 'react';
 import { useLocale } from '../context/LocaleContext';
-import {
-  Autocomplete,
-  Box,
-  Container,
-  Typography,
-  TextField,
-  Stack,
-  Divider,
-  MenuItem,
-} from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Dayjs } from 'dayjs';
 import { filterOptions, getRandomGoal, LAST_GOAL } from '../helpers/goals';
 import { buildWebsiteJsonLd, homeMeta } from '../helpers/seo';
 import background from '../assets/messi_argentina_dark.jpg';
-import { CalendarMonth, FilterList, PlayArrow, SportsSoccer, TableRows, Tag } from '@mui/icons-material';
+import { Calendar, Filter, Play, Goal, TableProperties, Hash } from 'lucide-react';
 import { TranslationKey } from '../i18n/translations';
 import PageMeta from '../components/PageMeta';
+import ClearableField from '../components/ClearableField';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Separator } from '../components/ui/separator';
+import { Combobox } from '../components/ui/combobox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import { cn } from '../lib/utils';
 
-type DateType = {
-  day: Dayjs | null;
-  month: Dayjs | null;
-  year: Dayjs | null;
+const days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
+const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+
+const monthLabel = (monthValue: string, locale: string) => {
+  const name = new Intl.DateTimeFormat(locale, { month: 'long' }).format(
+    new Date(2000, Number(monthValue) - 1, 1),
+  );
+  const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+  return `${monthValue} · ${capitalized}`;
 };
-
-const panelBg = 'rgba(10, 12, 16, 0.72)';
-const panelBorder = 'rgba(255, 255, 255, 0.08)';
 
 const MainPage: React.FC = () => {
   const { locale, t } = useLocale();
   const meta = homeMeta(locale);
-  const [date, setDate] = React.useState<DateType>({
-    day: null,
-    month: null,
-    year: null,
-  });
+  const [day, setDay] = React.useState('');
+  const [month, setMonth] = React.useState('');
+  const [year, setYear] = React.useState('');
   const [team, setTeam] = React.useState('');
   const [competition, setCompetition] = React.useState<string | null>(null);
   const [opponent, setOpponent] = React.useState<string | null>(null);
@@ -58,23 +59,13 @@ const MainPage: React.FC = () => {
     { value: '2005–26', label: t('home.statEra') },
   ];
 
-  const handleDateChange = (key: keyof DateType) => (newValue: Dayjs | null) => {
-    setDate((prevDate) => ({
-      ...prevDate,
-      [key]: newValue,
-    }));
-  };
-
   const handleGoalNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGoalNumber(event.target.value);
+    setGoalNumber(event.target.value.replace(/\D/g, ''));
     setGoalNumberError('');
   };
 
   const handleGoalSearch = () => {
     const params = new URLSearchParams();
-    const day = date.day?.format('DD');
-    const month = date.month?.format('MM');
-    const year = date.year?.format('YYYY');
 
     if (day) params.set('day', day);
     if (month) params.set('month', month);
@@ -115,16 +106,7 @@ const MainPage: React.FC = () => {
   };
 
   const hasSearchFilters = Boolean(
-    date.day ||
-      date.month ||
-      date.year ||
-      team ||
-      competition ||
-      opponent ||
-      type ||
-      how ||
-      minuteMin ||
-      minuteMax,
+    day || month || year || team || competition || opponent || type || how || minuteMin || minuteMax,
   );
 
   return (
@@ -134,274 +116,321 @@ const MainPage: React.FC = () => {
         <img src={background} alt="Lionel Messi with Argentina" />
       </div>
 
-      <Container
-        maxWidth="md"
-        sx={{
-          py: { xs: 4, md: 6 },
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: { xs: 'flex-start', md: 'center' },
-        }}
-      >
-        <Box textAlign="center" mb={{ xs: 4, md: 5 }}>
-          <Typography component="p" className="hero-kicker">
-            {t('home.kicker')}
-          </Typography>
+      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-start px-4 py-8 md:justify-center md:py-12">
+        <div className="mb-8 text-center md:mb-10">
+          <p className="hero-kicker">{t('home.kicker')}</p>
 
-          <Typography
-            variant="h2"
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              lineHeight: 1.05,
-              letterSpacing: '-0.02em',
-              mb: 2,
-              fontSize: { xs: '2.4rem', sm: '3.2rem', md: '3.8rem' },
-            }}
-          >
+          <h1 className="mb-4 text-[2.4rem] leading-[1.05] font-extrabold tracking-tight sm:text-[3.2rem] md:text-[3.8rem]">
             {t('home.headlineGoals', { count: LAST_GOAL })}
             <br />
             <span className="gradient-text">{t('home.headlineGoat')}</span>
-          </Typography>
+          </h1>
 
-          <Typography
-            sx={{
-              mb: 3,
-              opacity: 0.85,
-              maxWidth: 520,
-              mx: 'auto',
-              fontSize: { xs: '1rem', sm: '1.1rem' },
-            }}
-          >
-            {t('home.subtitle')}
-          </Typography>
+          <p className="mx-auto mb-6 max-w-[520px] text-base opacity-85 sm:text-lg">{t('home.subtitle')}</p>
 
-          <Stack
-            direction="row"
-            spacing={0}
-            justifyContent="center"
-            divider={<Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255,255,255,0.25)', my: 0.5 }} />}
-            sx={{ mb: 4 }}
-          >
-            {stats.map((stat) => (
-              <Box key={stat.label} sx={{ px: { xs: 2.5, sm: 4 } }}>
-                <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.4rem', sm: '1.7rem' }, lineHeight: 1.1 }}>
-                  {stat.value}
-                </Typography>
-                <Typography sx={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.12em', opacity: 0.7 }}>
-                  {stat.label}
-                </Typography>
-              </Box>
+          <div className="mb-8 flex items-stretch justify-center">
+            {stats.map((stat, index) => (
+              <React.Fragment key={stat.label}>
+                {index > 0 && <Separator orientation="vertical" className="my-1 bg-white/25" />}
+                <div className="px-5 sm:px-8">
+                  <div className="text-[1.4rem] leading-tight font-extrabold sm:text-[1.7rem]">{stat.value}</div>
+                  <div className="text-xs tracking-[0.12em] uppercase opacity-70">{stat.label}</div>
+                </div>
+              </React.Fragment>
             ))}
-          </Stack>
+          </div>
 
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" alignItems="center">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <button className="cta-primary" onClick={redirectToRandomGoal}>
-              <PlayArrow fontSize="small" />
+              <Play className="size-4" />
               {t('home.watchRandom')}
             </button>
             <button className="cta-ghost" onClick={() => (window.location.href = '/feed')}>
-              <SportsSoccer fontSize="small" />
+              <Goal className="size-4" />
               {t('home.browseFeed')}
             </button>
             <button className="cta-ghost" onClick={() => (window.location.href = '/table')}>
-              <TableRows fontSize="small" />
+              <TableProperties className="size-4" />
               {t('home.browseTable')}
             </button>
-          </Stack>
-        </Box>
+          </div>
+        </div>
 
-        <Box
-          sx={{
-            borderRadius: 4,
-            border: `1px solid ${panelBorder}`,
-            backgroundColor: panelBg,
-            backdropFilter: 'blur(14px)',
-            p: { xs: 3, sm: 4 },
-            boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-            color: 'text.primary',
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, textAlign: 'center', mb: 0.5 }}>
-            {t('home.finderTitle')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 3 }}>
-            {t('home.finderSubtitle')}
-          </Typography>
+        <div className="rounded-2xl border border-white/8 bg-[rgba(10,12,16,0.72)] p-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px] sm:p-8">
+          <h2 className="mb-1 text-center text-lg font-bold">{t('home.finderTitle')}</h2>
+          <p className="mb-6 text-center text-sm text-muted-foreground">{t('home.finderSubtitle')}</p>
 
-          <Box sx={{ mb: 3 }}>
-            <Typography
-              variant="overline"
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.75, letterSpacing: '0.12em', opacity: 0.8, mb: 1.5 }}
-            >
-              <CalendarMonth sx={{ fontSize: 16 }} color="primary" />
+          <div className="mb-6">
+            <div className="mb-3 flex items-center gap-2 text-xs font-medium tracking-[0.12em] uppercase opacity-80">
+              <Calendar className="size-4 text-primary" />
               {t('home.byDate')}
-            </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-              <DatePicker
-                label={t('home.day')}
-                views={['day']}
-                value={date.day}
-                onChange={handleDateChange('day')}
-                slotProps={{ textField: { fullWidth: true, size: 'small' } }}
-              />
-              <DatePicker
-                label={t('home.month')}
-                views={['month']}
-                value={date.month}
-                onChange={handleDateChange('month')}
-                slotProps={{ textField: { fullWidth: true, size: 'small' } }}
-              />
-              <DatePicker
-                label={t('home.year')}
-                views={['year']}
-                value={date.year}
-                onChange={handleDateChange('year')}
-                disableFuture
-                slotProps={{ textField: { fullWidth: true, size: 'small' } }}
-              />
-            </Stack>
-          </Box>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="w-full space-y-1.5 text-left">
+                <Label className="text-xs text-muted-foreground">{t('home.day')}</Label>
+                <ClearableField
+                  hasValue={Boolean(day)}
+                  onClear={() => setDay('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={day || undefined} onValueChange={setDay}>
+                    <SelectTrigger className={cn('w-full', day && 'pr-14')}>
+                      <SelectValue placeholder={t('home.day')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {days.map((d) => (
+                        <SelectItem key={d} value={d}>
+                          {d}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5 text-left">
+                <Label className="text-xs text-muted-foreground">{t('home.month')}</Label>
+                <ClearableField
+                  hasValue={Boolean(month)}
+                  onClear={() => setMonth('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={month || undefined} onValueChange={setMonth}>
+                    <SelectTrigger className={cn('w-full', month && 'pr-14')}>
+                      <SelectValue placeholder={t('home.month')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((m) => (
+                        <SelectItem key={m} value={m}>
+                          {monthLabel(m, locale)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+              <div className="w-full space-y-1.5 text-left">
+                <Label className="text-xs text-muted-foreground">{t('home.year')}</Label>
+                <ClearableField
+                  hasValue={Boolean(year)}
+                  onClear={() => setYear('')}
+                  trailing="select"
+                  clearLabel={t('common.clear')}
+                >
+                  <Select value={year || undefined} onValueChange={setYear}>
+                    <SelectTrigger className={cn('w-full', year && 'pr-14')}>
+                      <SelectValue placeholder={t('home.year')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.years.map((y) => (
+                        <SelectItem key={y} value={y}>
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </ClearableField>
+              </div>
+            </div>
+          </div>
 
-          <Box sx={{ mb: 3 }}>
-            <Typography
-              variant="overline"
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.75, letterSpacing: '0.12em', opacity: 0.8, mb: 1.5 }}
-            >
-              <FilterList sx={{ fontSize: 16 }} color="primary" />
+          <div className="mb-6">
+            <div className="mb-3 flex items-center gap-2 text-xs font-medium tracking-[0.12em] uppercase opacity-80">
+              <Filter className="size-4 text-primary" />
               {t('home.byMatchDetails')}
-            </Typography>
-            <Stack spacing={1.5}>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                <TextField
-                  select
-                  label={t('home.team')}
-                  size="small"
-                  value={team}
-                  onChange={(e) => setTeam(e.target.value)}
-                  fullWidth
-                >
-                  <MenuItem value="">{t('home.anyTeam')}</MenuItem>
-                  {filterOptions.teams.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <Autocomplete
-                  options={filterOptions.competitions}
-                  value={competition}
-                  onChange={(_e, value) => setCompetition(value)}
-                  renderInput={(params) => <TextField {...params} label={t('home.competition')} size="small" />}
-                  fullWidth
-                />
-              </Stack>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                <Autocomplete
-                  options={filterOptions.opponents}
-                  value={opponent}
-                  onChange={(_e, value) => setOpponent(value)}
-                  renderInput={(params) => <TextField {...params} label={t('home.opponent')} size="small" />}
-                  fullWidth
-                />
-                <TextField
-                  select
-                  label={t('home.goalType')}
-                  size="small"
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  fullWidth
-                >
-                  <MenuItem value="">{t('home.anyType')}</MenuItem>
-                  {filterOptions.types.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {translateMeta(option)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  select
-                  label={t('home.scoredWith')}
-                  size="small"
-                  value={how}
-                  onChange={(e) => setHow(e.target.value)}
-                  fullWidth
-                >
-                  <MenuItem value="">{t('home.any')}</MenuItem>
-                  {filterOptions.hows.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {translateMeta(option)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Stack>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-                <TextField
-                  label={t('home.minuteFrom')}
-                  type="number"
-                  size="small"
-                  value={minuteMin}
-                  onChange={(e) => setMinuteMin(e.target.value)}
-                  fullWidth
-                  inputProps={{ min: 1, max: 120 }}
-                />
-                <TextField
-                  label={t('home.minuteTo')}
-                  type="number"
-                  size="small"
-                  value={minuteMax}
-                  onChange={(e) => setMinuteMax(e.target.value)}
-                  fullWidth
-                  inputProps={{ min: 1, max: 120 }}
-                />
-              </Stack>
-            </Stack>
-          </Box>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.team')}</Label>
+                  <ClearableField
+                    hasValue={Boolean(team)}
+                    onClear={() => setTeam('')}
+                    trailing="select"
+                    clearLabel={t('common.clear')}
+                  >
+                    <Select
+                      value={team || undefined}
+                      onValueChange={setTeam}
+                    >
+                      <SelectTrigger className={cn('w-full', team && 'pr-14')}>
+                        <SelectValue placeholder={t('home.anyTeam')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filterOptions.teams.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </ClearableField>
+                </div>
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.competition')}</Label>
+                  <Combobox
+                    options={filterOptions.competitions}
+                    value={competition}
+                    onChange={setCompetition}
+                    placeholder={t('home.competition')}
+                    clearLabel={t('common.clear')}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.opponent')}</Label>
+                  <Combobox
+                    options={filterOptions.opponents}
+                    value={opponent}
+                    onChange={setOpponent}
+                    placeholder={t('home.opponent')}
+                    clearLabel={t('common.clear')}
+                  />
+                </div>
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.goalType')}</Label>
+                  <ClearableField
+                    hasValue={Boolean(type)}
+                    onClear={() => setType('')}
+                    trailing="select"
+                    clearLabel={t('common.clear')}
+                  >
+                    <Select value={type || undefined} onValueChange={setType}>
+                      <SelectTrigger className={cn('w-full', type && 'pr-14')}>
+                        <SelectValue placeholder={t('home.anyType')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filterOptions.types.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {translateMeta(option)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </ClearableField>
+                </div>
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.scoredWith')}</Label>
+                  <ClearableField
+                    hasValue={Boolean(how)}
+                    onClear={() => setHow('')}
+                    trailing="select"
+                    clearLabel={t('common.clear')}
+                  >
+                    <Select value={how || undefined} onValueChange={setHow}>
+                      <SelectTrigger className={cn('w-full', how && 'pr-14')}>
+                        <SelectValue placeholder={t('home.any')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filterOptions.hows.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {translateMeta(option)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </ClearableField>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.minuteFrom')}</Label>
+                  <ClearableField
+                    hasValue={Boolean(minuteMin)}
+                    onClear={() => setMinuteMin('')}
+                    clearLabel={t('common.clear')}
+                  >
+                    <Input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={minuteMin}
+                      onChange={(e) => setMinuteMin(e.target.value)}
+                      className={cn(minuteMin && 'pr-8')}
+                    />
+                  </ClearableField>
+                </div>
+                <div className="w-full space-y-1.5 text-left">
+                  <Label className="text-xs text-muted-foreground">{t('home.minuteTo')}</Label>
+                  <ClearableField
+                    hasValue={Boolean(minuteMax)}
+                    onClear={() => setMinuteMax('')}
+                    clearLabel={t('common.clear')}
+                  >
+                    <Input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={minuteMax}
+                      onChange={(e) => setMinuteMax(e.target.value)}
+                      className={cn(minuteMax && 'pr-8')}
+                    />
+                  </ClearableField>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <button className="cta-secondary" onClick={handleGoalSearch} disabled={!hasSearchFilters}>
             {t('home.searchGoals')}
           </button>
 
-          <Divider sx={{ my: 3 }} />
+          <Separator className="my-6 bg-white/10" />
 
-          <Box>
-            <Typography
-              variant="overline"
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.75, letterSpacing: '0.12em', opacity: 0.8, mb: 1.5 }}
-            >
-              <Tag sx={{ fontSize: 16 }} color="primary" />
+          <div>
+            <div className="mb-3 flex items-center gap-2 text-xs font-medium tracking-[0.12em] uppercase opacity-80">
+              <Hash className="size-4 text-primary" />
               {t('home.byGoalNumber')}
-            </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'flex-start' }}>
-              <TextField
-                label={t('home.goalNumberLabel', { max: LAST_GOAL })}
-                type="number"
-                size="small"
-                value={goalNumber}
-                onChange={handleGoalNumberChange}
-                error={!!goalNumberError}
-                helperText={goalNumberError}
-                fullWidth
-                inputProps={{ min: 1, max: LAST_GOAL }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleGoalNumberSearch();
-                  }
-                }}
-              />
-              <button
-                className="cta-secondary"
-                onClick={handleGoalNumberSearch}
-                disabled={!goalNumber}
-                style={{ width: 'auto', minWidth: 140, flexShrink: 0 }}
-              >
-                {t('home.goToGoal')}
-              </button>
-            </Stack>
-          </Box>
-        </Box>
-      </Container>
+            </div>
+            <div className="w-full space-y-1.5 text-left">
+              <Label className="text-xs text-muted-foreground">
+                {t('home.goalNumberLabel', { max: LAST_GOAL })}
+              </Label>
+              <div className="grid grid-cols-1 items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                <ClearableField
+                  hasValue={Boolean(goalNumber)}
+                  onClear={() => {
+                    setGoalNumber('');
+                    setGoalNumberError('');
+                  }}
+                  clearLabel={t('common.clear')}
+                >
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={goalNumber}
+                    onChange={handleGoalNumberChange}
+                    aria-invalid={!!goalNumberError}
+                    placeholder={`1–${LAST_GOAL}`}
+                    className={cn(
+                      'h-11 w-full min-w-0 text-base md:text-base',
+                      goalNumber && 'pr-8',
+                    )}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleGoalNumberSearch();
+                      }
+                    }}
+                  />
+                </ClearableField>
+                <button
+                  className="cta-secondary h-11 w-full sm:!w-auto sm:min-w-[140px]"
+                  onClick={handleGoalNumberSearch}
+                  disabled={!goalNumber}
+                >
+                  {t('home.goToGoal')}
+                </button>
+              </div>
+              {goalNumberError && (
+                <p className="text-xs text-destructive">{goalNumberError}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

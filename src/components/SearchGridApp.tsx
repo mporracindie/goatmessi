@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 import { Goal } from '../types/Goal';
 import { isSpecialDate } from '../helpers/specialDates';
-import { Tooltip } from '@mui/material';
 import { TranslationKey } from '../i18n/translations';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 const SearchGridApp = ({ goals }: { goals: Goal[] }) => {
   const { locale, t } = useLocale();
@@ -31,14 +31,17 @@ const SearchGridApp = ({ goals }: { goals: Goal[] }) => {
         const label = formatGoalLabel(goal);
 
         return (
-          <Tooltip key={goal.goalNumber} title={specialMessage || label} arrow placement="top">
-            <Link
-              className={`goal-chip link-btn-video${isSpecial ? ' goal-chip-special' : ''}`}
-              to={`/goal/${goal.goalNumber}`}
-            >
-              {isSpecial && '⭐ '}
-              {label}
-            </Link>
+          <Tooltip key={goal.goalNumber}>
+            <TooltipTrigger asChild>
+              <Link
+                className={`goal-chip link-btn-video${isSpecial ? ' goal-chip-special' : ''}`}
+                to={`/goal/${goal.goalNumber}`}
+              >
+                {isSpecial && '⭐ '}
+                {label}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>{specialMessage || label}</TooltipContent>
           </Tooltip>
         );
       })}

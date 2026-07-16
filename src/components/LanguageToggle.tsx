@@ -1,7 +1,10 @@
 import React from 'react';
-import { Button, ButtonGroup, Tooltip } from '@mui/material';
 import { useLocale } from '../context/LocaleContext';
 import { Locale } from '../i18n/translations';
+import { Button } from './ui/button';
+import { ButtonGroup } from './ui/button-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { cn } from '../lib/utils';
 
 const LanguageToggle: React.FC = () => {
   const { locale, setLocale, t } = useLocale();
@@ -13,42 +16,36 @@ const LanguageToggle: React.FC = () => {
   };
 
   return (
-    <Tooltip title={t('common.language')} arrow>
-      <ButtonGroup
-        size="small"
-        variant="outlined"
-        sx={{
-          position: 'fixed',
-          top: 16,
-          right: 16,
-          zIndex: 20,
-          bgcolor: 'rgba(0,0,0,0.35)',
-          backdropFilter: 'blur(8px)',
-          borderRadius: 2,
-          overflow: 'hidden',
-          '& .MuiButton-root': {
-            color: 'common.white',
-            borderColor: 'rgba(255,255,255,0.35)',
-            minWidth: 42,
-            px: 1.25,
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-          },
-          '& .MuiButton-root.Mui-disabled': {
-            color: '#06131a',
-            bgcolor: '#1fc3e7',
-            borderColor: '#1fc3e7',
-            opacity: 1,
-          },
-        }}
-      >
-        <Button disabled={locale === 'en'} onClick={select('en')} aria-label={t('common.english')}>
-          EN
-        </Button>
-        <Button disabled={locale === 'es'} onClick={select('es')} aria-label={t('common.spanish')}>
-          ES
-        </Button>
-      </ButtonGroup>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <ButtonGroup
+          className="fixed top-4 right-4 z-20 overflow-hidden rounded-lg border border-white/35 bg-black/35 backdrop-blur-md"
+          aria-label={t('common.language')}
+        >
+          {(['en', 'es'] as const).map((code) => {
+            const active = locale === code;
+            return (
+              <Button
+                key={code}
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={active}
+                onClick={select(code)}
+                aria-label={code === 'en' ? t('common.english') : t('common.spanish')}
+                className={cn(
+                  'min-w-[42px] px-3 font-bold tracking-wide text-white hover:bg-white/10 hover:text-white',
+                  active &&
+                    'bg-primary text-primary-foreground opacity-100 disabled:opacity-100 hover:bg-primary hover:text-primary-foreground',
+                )}
+              >
+                {code.toUpperCase()}
+              </Button>
+            );
+          })}
+        </ButtonGroup>
+      </TooltipTrigger>
+      <TooltipContent>{t('common.language')}</TooltipContent>
     </Tooltip>
   );
 };

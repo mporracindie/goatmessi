@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
-import { Container, Typography, Box, ToggleButton, ToggleButtonGroup, Stack } from '@mui/material';
-import { PlayArrow, Home as HomeIcon } from '@mui/icons-material';
+import { Play, Home } from 'lucide-react';
 import { getRandomGoal, hasActiveFilters, searchGoals } from '../helpers/goals';
 import { savePlaylist } from '../helpers/playlist';
 import background from '../assets/messi_argentina_dark.jpg';
@@ -10,6 +9,7 @@ import SearchGridApp from '../components/SearchGridApp';
 import { getSpecialDateMessage } from '../helpers/specialDates';
 import { TranslationKey } from '../i18n/translations';
 import PageMeta from '../components/PageMeta';
+import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group';
 
 const panelBg = 'rgba(10, 12, 16, 0.72)';
 const panelBorder = 'rgba(255, 255, 255, 0.08)';
@@ -116,12 +116,6 @@ const Search: React.FC = () => {
   const isMessisBirthday = dayNumber === 24 && monthNumber === 6;
   const specialDateMessage = getSpecialDateMessage(dayNumber, monthNumber, yearNumber, locale);
 
-  const handleSortChange = (_event: React.MouseEvent<HTMLElement>, newSortBy: 'number' | 'date') => {
-    if (newSortBy !== null) {
-      setSortBy(newSortBy);
-    }
-  };
-
   const redirectToRandomGoal = () => {
     window.location.href = `/goal/${getRandomGoal()}`;
   };
@@ -146,167 +140,96 @@ const Search: React.FC = () => {
         <img src={background} alt="Lionel Messi with Argentina" />
       </div>
 
-      <Container
-        maxWidth="md"
-        sx={{
-          py: { xs: 4, md: 6 },
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-        }}
-      >
+      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center px-4 py-8 text-center md:py-12">
         {isMessisBirthday && (
-          <Typography
-            sx={{
-              fontWeight: 800,
-              fontSize: { xs: '1.8rem', sm: '2.4rem' },
-              mb: 2,
-              color: specialColor,
-            }}
+          <p
+            className="mb-4 text-[1.8rem] font-extrabold sm:text-[2.4rem]"
+            style={{ color: specialColor }}
           >
             {t('search.happyBirthday')}
-          </Typography>
+          </p>
         )}
 
         {goals.length === 0 ? (
-          <Box
-            sx={{
-              width: '100%',
-              borderRadius: 4,
-              border: `1px solid ${panelBorder}`,
-              backgroundColor: panelBg,
-              backdropFilter: 'blur(14px)',
-              p: { xs: 3, sm: 4 },
-              boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-            }}
+          <div
+            className="w-full rounded-2xl border p-6 shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px] sm:p-8"
+            style={{ borderColor: panelBorder, backgroundColor: panelBg }}
           >
-            <Typography component="p" className="hero-kicker">
-              {t('search.kicker')}
-            </Typography>
+            <p className="hero-kicker">{t('search.kicker')}</p>
             {specialDateMessage && (
-              <Typography
-                sx={{
-                  mb: 1.5,
-                  color: specialColor,
-                  fontWeight: 700,
-                }}
-              >
+              <p className="mb-3 font-bold" style={{ color: specialColor }}>
                 🎉 {specialDateMessage}
-              </Typography>
+              </p>
             )}
-            <Typography
-              component="h1"
-              sx={{
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                fontSize: { xs: '2rem', sm: '2.6rem' },
-                lineHeight: 1.1,
-                mb: 1.5,
-              }}
-            >
+            <h1 className="mb-3 text-[2rem] leading-tight font-extrabold tracking-tight sm:text-[2.6rem]">
               {t('search.noGoalsFound')}
-            </Typography>
+            </h1>
             {filterSummary && (
-              <Typography sx={{ opacity: 0.85, maxWidth: 480, mx: 'auto' }}>{filterSummary}</Typography>
+              <p className="mx-auto max-w-[480px] opacity-85">{filterSummary}</p>
             )}
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={2}
-              justifyContent="center"
-              alignItems="center"
-              sx={{ mt: 3 }}
-            >
+            <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <button className="cta-ghost" onClick={() => (window.location.href = '/')}>
-                <HomeIcon fontSize="small" />
+                <Home className="size-4" />
                 {t('search.searchAgain')}
               </button>
               <button className="cta-primary" onClick={redirectToRandomGoal}>
-                <PlayArrow fontSize="small" />
+                <Play className="size-4" />
                 {t('search.random')}
               </button>
-            </Stack>
-          </Box>
+            </div>
+          </div>
         ) : (
           <>
-            <Box sx={{ mb: { xs: 3, md: 4 }, width: '100%' }}>
-              <Typography component="p" className="hero-kicker">
-                {t('search.kicker')}
-              </Typography>
-              <Typography
-                component="h1"
-                sx={{
-                  fontWeight: 800,
-                  letterSpacing: '-0.02em',
-                  fontSize: { xs: '2.2rem', sm: '3rem' },
-                  lineHeight: 1.1,
-                  mb: 1.5,
-                }}
-              >
+            <div className="mb-6 w-full md:mb-8">
+              <p className="hero-kicker">{t('search.kicker')}</p>
+              <h1 className="mb-3 text-[2.2rem] leading-tight font-extrabold tracking-tight sm:text-[3rem]">
                 <span className="gradient-text">{goals.length}</span>{' '}
                 {t(goals.length === 1 ? 'search.goalLabel' : 'search.goalsLabel')}
-              </Typography>
+              </h1>
               {filterSummary && (
-                <Typography sx={{ opacity: 0.85, mb: specialDateMessage ? 1.5 : 0, maxWidth: 520, mx: 'auto' }}>
+                <p
+                  className={`mx-auto max-w-[520px] opacity-85 ${specialDateMessage ? 'mb-3' : ''}`}
+                >
                   {filterSummary}
-                </Typography>
+                </p>
               )}
               {specialDateMessage && (
-                <Typography sx={{ color: specialColor, fontWeight: 700 }}>🎉 {specialDateMessage}</Typography>
+                <p className="font-bold" style={{ color: specialColor }}>
+                  🎉 {specialDateMessage}
+                </p>
               )}
-            </Box>
+            </div>
 
-            <Box
-              sx={{
-                width: '100%',
-                borderRadius: 4,
-                border: `1px solid ${panelBorder}`,
-                backgroundColor: panelBg,
-                backdropFilter: 'blur(14px)',
-                p: { xs: 2.5, sm: 3.5 },
-                boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-                mb: 3,
-              }}
+            <div
+              className="mb-6 w-full rounded-2xl border p-5 shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px] sm:p-7"
+              style={{ borderColor: panelBorder, backgroundColor: panelBg }}
             >
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={1.5}
-                justifyContent="center"
-                alignItems="center"
-                sx={{ mb: 3 }}
-              >
-                <ToggleButtonGroup
+              <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <ToggleGroup
+                  type="single"
                   value={sortBy}
-                  exclusive
-                  onChange={handleSortChange}
-                  aria-label={t('search.sortBy')}
-                  size="small"
-                  sx={{
-                    '& .MuiToggleButton-root': {
-                      color: 'inherit',
-                      borderColor: 'rgba(255,255,255,0.25)',
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      px: 2,
-                      '&.Mui-selected': {
-                        color: '#06131a',
-                        bgcolor: '#1fc3e7',
-                        borderColor: '#1fc3e7',
-                        '&:hover': {
-                          bgcolor: '#4fd8f5',
-                        },
-                      },
-                    },
+                  onValueChange={(value) => {
+                    if (value === 'number' || value === 'date') setSortBy(value);
                   }}
+                  variant="outline"
+                  spacing={0}
+                  aria-label={t('search.sortBy')}
                 >
-                  <ToggleButton value="number" aria-label={t('search.sortByNumber')}>
+                  <ToggleGroupItem
+                    value="number"
+                    aria-label={t('search.sortByNumber')}
+                    className="px-4 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
                     {t('search.sortByNumber')}
-                  </ToggleButton>
-                  <ToggleButton value="date" aria-label={t('search.sortByDate')}>
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="date"
+                    aria-label={t('search.sortByDate')}
+                    className="px-4 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
                     {t('search.sortByDate')}
-                  </ToggleButton>
-                </ToggleButtonGroup>
+                  </ToggleGroupItem>
+                </ToggleGroup>
 
                 {goals.length > 1 && (
                   <button
@@ -314,35 +237,35 @@ const Search: React.FC = () => {
                     onClick={playAllResults}
                     style={{ width: 'auto', minWidth: 120, padding: '6px 16px', fontSize: '0.85rem' }}
                   >
-                    <PlayArrow sx={{ fontSize: 16 }} />
+                    <Play className="size-4" />
                     {t('search.viewAll')}
                   </button>
                 )}
-              </Stack>
+              </div>
 
               <SearchGridApp goals={goals} />
-            </Box>
+            </div>
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" alignItems="center">
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <button className="cta-ghost" onClick={() => (window.location.href = '/')}>
-                <HomeIcon fontSize="small" />
+                <Home className="size-4" />
                 {t('search.searchAgain')}
               </button>
               {goals.length > 1 ? (
                 <button className="cta-primary" onClick={playAllResults}>
-                  <PlayArrow fontSize="small" />
+                  <Play className="size-4" />
                   {t('search.viewAll')}
                 </button>
               ) : (
                 <button className="cta-primary" onClick={redirectToRandomGoal}>
-                  <PlayArrow fontSize="small" />
+                  <Play className="size-4" />
                   {t('search.random')}
                 </button>
               )}
-            </Stack>
+            </div>
           </>
         )}
-      </Container>
+      </div>
     </>
   );
 };

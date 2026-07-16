@@ -20,7 +20,7 @@ Spanish is the primary language; the UI also supports English via a language tog
 
 - [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
-- [MUI](https://mui.com/) + Emotion
+- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
 - [React Router](https://reactrouter.com/)
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
 
