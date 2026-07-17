@@ -14,6 +14,7 @@ export const translations = {
       watchRandom: 'Watch a random goal',
       browseFeed: 'Browse the feed',
       browseTable: 'View the list',
+      browseCharts: 'Grafiquitos',
       finderTitle: 'Looking for a specific goal?',
       finderSubtitle:
         'Mix date, club, competition, opponent, minute, or how it was scored — then jump to the clip.',
@@ -103,6 +104,38 @@ export const translations = {
       colType: 'Type',
       colHow: 'Scored with',
     },
+    grafiquitos: {
+      kicker: 'Career charts',
+      title: 'Grafiquitos',
+      subtitle:
+        'Visual breakdowns of every Messi goal — by calendar day, month, year, minute, finish, and more.',
+      basedOn: 'Based on {count} goals in the archive',
+      backHome: 'Back to home',
+      goals: 'Goals',
+      emptyDays: 'Blank days',
+      scoredDays: 'Days with goals',
+      busiestDay: 'Busiest day: {day} ({count} goals)',
+      dayTitle: 'Goals by day of the year',
+      dayDescription:
+        'Every calendar day (Jan 1–Dec 31, including Feb 29). Dim bars are days he has never scored.',
+      monthTitle: 'Goals by month',
+      monthDescription: 'Which months of the year stack up the most goals across his career.',
+      yearTitle: 'Goals by year',
+      yearDescription: 'Stacked by team — Barcelona, Argentina, PSG, Inter Miami.',
+      minuteTitle: 'Goals by minute',
+      minuteDescription:
+        'Distribution across every match minute (1–90, plus stoppage). Stacked by how it was scored — left foot, right foot, head, and rarer finishes.',
+      minuteTooltip: "Minute {minute} · {count} goals",
+      howTitle: 'Scored with',
+      howDescription: 'Left foot, right foot, head, and the rare odd finishes.',
+      typeTitle: 'Goal type',
+      typeDescription: 'Open play, penalties, free kicks, solo runs, and rebounds.',
+      opponentsTitle: 'Favorite victims',
+      opponentsDescription: 'Clubs and national teams he has scored against the most.',
+      competitionTitle: 'By competition',
+      competitionDescription: 'Where the goals came from — leagues, cups, and internationals.',
+      unknownType: 'Unclassified',
+    },
     common: {
       language: 'Language',
       english: 'English',
@@ -119,6 +152,9 @@ export const translations = {
       tableTitle: 'Messi goals table — full career archive',
       tableDescription:
         "Browse every Lionel Messi goal in a filterable table. Sort and filter by team, competition, opponent, year, minute, or finish type.",
+      grafiquitosTitle: 'Messi goal charts — grafiquitos',
+      grafiquitosDescription:
+        "Charts of Lionel Messi's career goals by day of the year, month, year and team, minute, finish type, opponents, and competition.",
       searchTitle: 'Messi goal search results',
       searchDescription:
         'Filtered Lionel Messi goals from the video archive. Refine by date, club, competition, opponent, minute, or finish.',
@@ -155,6 +191,7 @@ export const translations = {
       watchRandom: 'Ver un gol al azar',
       browseFeed: 'Ver el feed',
       browseTable: 'Ver listado',
+      browseCharts: 'Grafiquitos',
       finderTitle: '¿Buscás un gol en particular?',
       finderSubtitle:
         'Combiná fecha, club, competencia, rival, minuto o cómo lo hizo — y saltá al video.',
@@ -245,6 +282,38 @@ export const translations = {
       colType: 'Tipo',
       colHow: 'Anotado con',
     },
+    grafiquitos: {
+      kicker: 'Gráficos de carrera',
+      title: 'Grafiquitos',
+      subtitle:
+        'Desgloses visuales de todos los goles de Messi — por día del año, mes, año, minuto, definición y más.',
+      basedOn: 'Basado en {count} goles del archivo',
+      backHome: 'Volver al inicio',
+      goals: 'Goles',
+      emptyDays: 'Días en blanco',
+      scoredDays: 'Días con goles',
+      busiestDay: 'Día más goleador: {day} ({count} goles)',
+      dayTitle: 'Goles por día del año',
+      dayDescription:
+        'Cada día del calendario (1 ene–31 dic, incluido el 29 feb). Las barras tenues son días en los que nunca convirtió.',
+      monthTitle: 'Goles por mes',
+      monthDescription: 'En qué meses del año acumula más goles a lo largo de su carrera.',
+      yearTitle: 'Goles por año',
+      yearDescription: 'Apilados por equipo — Barcelona, Argentina, PSG, Inter Miami.',
+      minuteTitle: 'Goles por minuto',
+      minuteDescription:
+        'Distribución minuto a minuto del partido (1–90, más descuento). Apilado por cómo lo hizo — pie izquierdo, derecho, cabeza y rarezas.',
+      minuteTooltip: 'Minuto {minute} · {count} goles',
+      howTitle: 'Anotado con',
+      howDescription: 'Pie izquierdo, derecho, cabeza y las rarezas.',
+      typeTitle: 'Tipo de gol',
+      typeDescription: 'Jugada, penales, tiros libres, arrancadas individuales y rebotes.',
+      opponentsTitle: 'Víctimas favoritas',
+      opponentsDescription: 'Clubes y selecciones a las que más les convirtió.',
+      competitionTitle: 'Por competencia',
+      competitionDescription: 'De dónde salieron los goles — ligas, copas e internacionales.',
+      unknownType: 'Sin clasificar',
+    },
     common: {
       language: 'Idioma',
       english: 'English',
@@ -261,6 +330,9 @@ export const translations = {
       tableTitle: 'Tabla de goles de Messi — archivo completo',
       tableDescription:
         'Recorré todos los goles de Lionel Messi en una tabla filtrable. Ordená y filtrá por equipo, competencia, rival, año, minuto o definición.',
+      grafiquitosTitle: 'Gráficos de goles de Messi — grafiquitos',
+      grafiquitosDescription:
+        'Gráficos de los goles de Lionel Messi por día del año, mes, año y equipo, minuto, tipo de definición, rivales y competencia.',
       searchTitle: 'Resultados de goles de Messi',
       searchDescription:
         'Goles de Lionel Messi filtrados del archivo en video. Afiná por fecha, club, competencia, rival, minuto o definición.',

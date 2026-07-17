@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLocale } from '../context/LocaleContext';
 
 const SiteFooter: React.FC = () => {
@@ -22,6 +22,12 @@ const SiteFooter: React.FC = () => {
         <a href="https://porracin.com/" target="_blank" rel="noopener noreferrer">
           porracin.com
         </a>
+        {pathname !== '/grafiquitos' ? (
+          <>
+            {' · '}
+            <Link to="/grafiquitos">{t('home.browseCharts')}</Link>
+          </>
+        ) : null}
       </p>
     </footer>
   );

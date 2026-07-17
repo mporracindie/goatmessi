@@ -4,7 +4,7 @@
 
 Site: https://todoslosgolesdemessi.com
 Language: Spanish (primary), English (UI toggle)
-Updated: 2026-07-16
+Updated: 2026-07-17
 
 ## Key facts
 
@@ -20,6 +20,7 @@ Updated: 2026-07-16
 - Home / search finder: https://todoslosgolesdemessi.com/
 - Scrollable goal feed: https://todoslosgolesdemessi.com/feed
 - Filterable goals table: https://todoslosgolesdemessi.com/table
+- Goal charts (grafiquitos): https://todoslosgolesdemessi.com/grafiquitos
 - Individual goal pages: https://todoslosgolesdemessi.com/goal/{number} (1–919)
 - Sitemap: https://todoslosgolesdemessi.com/sitemap.xml
 - Open Graph image: https://todoslosgolesdemessi.com/og.png

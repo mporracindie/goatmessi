@@ -294,10 +294,10 @@ body {
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.78 0.12 210);
   --chart-1: oklch(0.78 0.12 210);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --chart-2: oklch(0.72 0.1 240);
+  --chart-3: oklch(0.82 0.08 10);
+  --chart-4: oklch(0.82 0.14 90);
+  --chart-5: oklch(0.55 0.18 15);
   --radius: 0.625rem;
   --sidebar: oklch(0.18 0.015 250);
   --sidebar-foreground: oklch(0.985 0 0);

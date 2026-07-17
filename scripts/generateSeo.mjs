@@ -21,6 +21,7 @@ const urls = [
   { loc: `${SITE_URL}/`, changefreq: 'weekly', priority: '1.0' },
   { loc: `${SITE_URL}/feed`, changefreq: 'weekly', priority: '0.8' },
   { loc: `${SITE_URL}/table`, changefreq: 'weekly', priority: '0.8' },
+  { loc: `${SITE_URL}/grafiquitos`, changefreq: 'weekly', priority: '0.8' },
 ];
 
 for (const goal of goals) {
@@ -70,6 +71,7 @@ Updated: ${today}
 - Home / search finder: ${SITE_URL}/
 - Scrollable goal feed: ${SITE_URL}/feed
 - Filterable goals table: ${SITE_URL}/table
+- Goal charts (grafiquitos): ${SITE_URL}/grafiquitos
 - Individual goal pages: ${SITE_URL}/goal/{number} (1–${count})
 - Sitemap: ${SITE_URL}/sitemap.xml
 - Open Graph image: ${SITE_URL}/og.png
