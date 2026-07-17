@@ -56,9 +56,10 @@ const ChartCard: React.FC<{
   title: string;
   description: string;
   stat?: React.ReactNode;
+  headerAlign?: 'center' | 'split';
   className?: string;
   children: React.ReactNode;
-}> = ({ title, description, stat, className, children }) => (
+}> = ({ title, description, stat, headerAlign = 'center', className, children }) => (
   <section
     className={cn(
       'relative z-10 overflow-hidden rounded-2xl border p-4 shadow-[0_24px_60px_rgba(0,0,0,0.35)] backdrop-blur-[14px] sm:p-6',
@@ -66,12 +67,21 @@ const ChartCard: React.FC<{
     )}
     style={{ borderColor: panelBorder, backgroundColor: panelBg }}
   >
-    <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-      <div className="min-w-0">
+    <div
+      className={cn(
+        'mb-4 flex gap-3',
+        headerAlign === 'split'
+          ? 'flex-col items-stretch text-left sm:flex-row sm:items-start sm:justify-between'
+          : 'flex-col items-center text-center',
+      )}
+    >
+      <div className={cn('min-w-0', headerAlign === 'center' && 'max-w-2xl')}>
         <h2 className="text-lg font-bold tracking-tight sm:text-xl">{title}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
       </div>
-      {stat ? <div className="shrink-0 sm:text-right">{stat}</div> : null}
+      {stat ? (
+        <div className={cn('shrink-0', headerAlign === 'split' && 'sm:self-start')}>{stat}</div>
+      ) : null}
     </div>
     {children}
   </section>
@@ -254,8 +264,9 @@ const Grafiquitos: React.FC = () => {
           <ChartCard
             title={t('grafiquitos.dayTitle')}
             description={t('grafiquitos.dayDescription')}
+            headerAlign="split"
             stat={
-              <div className="flex gap-2">
+              <div className="flex justify-end gap-2">
                 <StatChip
                   value={dayOfYear.emptyDays}
                   label={t('grafiquitos.emptyDays')}
