@@ -144,6 +144,10 @@ export const SPECIAL_DATES: Record<string, SpecialDateMessage> = {
     en: 'Scores his 900th career goal against Nashville SC',
     es: 'Marca su gol número 900 ante el Nashville SC',
   },
+  '06-10-2026': {
+    en: 'Scores his last goal for Argentina against Benin and retires from the national team',
+    es: 'Marca su último gol con Argentina ante Benín y se retira de la selección',
+  },
 };
 
 const pickMessage = (message: SpecialDateMessage | undefined, locale: Locale = 'en') =>
