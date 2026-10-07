@@ -8,7 +8,7 @@ Spanish is the primary language; the UI also supports English via a language tog
 
 ## Features
 
-- Browse and filter **919** goals (Barcelona, Argentina, PSG, Inter Miami; 2005–2026)
+- Browse and filter **932** goals (Barcelona, Argentina, PSG, Inter Miami; 2005–2026)
 - Per-goal pages at `/goal/{number}` with match context and video
 - Scrollable chronological feed at `/feed`
 - Filterable table of every goal at `/table`

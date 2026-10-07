@@ -16,7 +16,7 @@ export default defineConfig({
         name: 'Todos los goles de Messi',
         short_name: 'Goles Messi',
         description:
-          'Reviví los 919 goles de Lionel Messi (2005–2026) en video. Buscá por fecha, club, rival o número.',
+          'Reviví los 932 goles de Lionel Messi (2005–2026) en video. Buscá por fecha, club, rival o número.',
         theme_color: '#1fc3e7',
         background_color: '#000000',
         display: 'standalone',

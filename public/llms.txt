@@ -4,13 +4,13 @@
 
 Site: https://todoslosgolesdemessi.com
 Language: Spanish (primary), English (UI toggle)
-Updated: 2026-07-17
+Updated: 2026-10-07
 
 ## Key facts
 
-- Total goals in archive: 919
+- Total goals in archive: 932
 - First goal: #1 (01-05-2005) — Barcelona vs Albacete
-- Latest goal: #919 (07-07-2026) — Argentina vs Egypt
+- Latest goal: #932 (06-10-2026) — Argentina vs Benin
 - Clubs / teams covered: Barcelona, Argentina, PSG, Inter Miami
 - Era covered: 2005–2026
 - Content type: goal video archive + filters + chronological feed
@@ -21,7 +21,7 @@ Updated: 2026-07-17
 - Scrollable goal feed: https://todoslosgolesdemessi.com/feed
 - Filterable goals table: https://todoslosgolesdemessi.com/table
 - Goal charts (grafiquitos): https://todoslosgolesdemessi.com/grafiquitos
-- Individual goal pages: https://todoslosgolesdemessi.com/goal/{number} (1–919)
+- Individual goal pages: https://todoslosgolesdemessi.com/goal/{number} (1–932)
 - Sitemap: https://todoslosgolesdemessi.com/sitemap.xml
 - Open Graph image: https://todoslosgolesdemessi.com/og.png
 
